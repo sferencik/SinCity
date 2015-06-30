@@ -4,13 +4,13 @@
     <name>sin-city</name>
     <display-name>sin-city</display-name>
     <version>@Version@</version>
-    <description>Plugin description</description>
+    <description>Find who in a series of changelists broke the build</description>
     <download-url>Plugin download URL</download-url>
-    <email>Plugin author e-mail</email>
+    <email>sferencik+sincity@gmail.com</email>
     <vendor>
       <name>@VendorName@</name>
       <url>@VendorURL@</url>
-      <logo>Plugin vendor logo URL</logo>
+      <logo>https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/1a9/369/2e9dbc5.jpg</logo>
     </vendor>
   </info>
   <deployment use-separate-classloader="true" />
