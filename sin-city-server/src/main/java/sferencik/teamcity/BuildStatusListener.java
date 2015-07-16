@@ -42,8 +42,8 @@ public class BuildStatusListener
                 Loggers.SERVER.debug("[SinCity] build id: " + build.getBuildId());
                 Loggers.SERVER.debug("[SinCity] build description: " + build.getBuildDescription());
                 Loggers.SERVER.debug("[SinCity] build successful: " + build.getBuildStatus().isSuccessful());
-                Loggers.SERVER.debug("[SinCity] build changes: " + containingChanges.size());
-                Loggers.SERVER.debug("[SinCity] build last change: " + (containingChanges.isEmpty() ? "none" : containingChanges.get(0).getDescription()));
+                Loggers.SERVER.debug("[SinCity] number of build changes: " + containingChanges.size());
+                Loggers.SERVER.debug("[SinCity] build changes: " + containingChanges);
 
                 final SBuildType buildType = build.getBuildType();
                 if (buildType == null)
