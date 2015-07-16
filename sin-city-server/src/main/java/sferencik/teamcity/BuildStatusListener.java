@@ -35,49 +35,50 @@ public class BuildStatusListener
             private String triggeredBySinCityParameterName = "triggered.by.sin.city";
 
             @Override
-            public void buildFinished(SRunningBuild build)
+            public void buildFinished(@NotNull SRunningBuild build)
             {
-                Loggers.SERVER.info("      *******************");
-                Loggers.SERVER.info("      * build id: " + build.getBuildId());
-                Loggers.SERVER.info("      * build successful: " + build.getBuildStatus().isSuccessful());
-                Loggers.SERVER.info("      * build changes: " + build.getContainingChanges().size());
-                Loggers.SERVER.info("      * build last change: " + build.getContainingChanges().get(0).getDescription());
+                final List<SVcsModification> containingChanges = build.getContainingChanges();
 
-                // does this build config use SinCity?
+                Loggers.SERVER.debug("[SinCity] build id: " + build.getBuildId());
+                Loggers.SERVER.debug("[SinCity] build description: " + build.getBuildDescription());
+                Loggers.SERVER.debug("[SinCity] build successful: " + build.getBuildStatus().isSuccessful());
+                Loggers.SERVER.debug("[SinCity] build changes: " + containingChanges.size());
+                Loggers.SERVER.debug("[SinCity] build last change: " + containingChanges.get(0).getDescription());
+
                 final SBuildType buildType = build.getBuildType();
                 if (buildType == null)
                     return;
 
                 for (SBuildFeatureDescriptor feature : buildType.getBuildFeatures()) {
                     if (feature.getClass().equals(SinCityBuildFeature.class)) {
-                        buildFinishedWithSinCity(build, buildType, feature);
+                        buildFinishedWithSinCity(build, buildType, feature, containingChanges);
                         break; // for now we only allow a single SinCity feature (see SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed())
                     }
                 }
             }
 
-            private void buildFinishedWithSinCity(SRunningBuild build, SBuildType buildType, SBuildFeatureDescriptor sinCityFeature)
+            private void buildFinishedWithSinCity(
+                    SRunningBuild build,
+                    SBuildType buildType,
+                    SBuildFeatureDescriptor sinCityFeature,
+                    List<SVcsModification> containingChanges)
             {
                 // tag the finished build
                 final String triggeredBySinCityParameterValue = build.getParametersProvider().get(triggeredBySinCityParameterName);
                 String tagParameterName = triggeredBySinCityParameterValue == null
                         ? "nonSinCityTag"
                         : "sinCityTag";
-                Loggers.SERVER.info(">>> will get '" + tagParameterName + "'");
                 final String tagName = sinCityFeature.getParameters().get(tagParameterName);
-                Loggers.SERVER.info(">>> value: '" + tagName + "'");
                 if (tagName != null && !tagName.isEmpty()) {
+                    Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");
                     final List<String> resultingTags = new ArrayList<String>(build.getTags());
                     resultingTags.add(tagName);
                     build.setTags(resultingTags);
-                    Loggers.SERVER.info(">>> set tags: '" + build.getTags() + "'");
                 }
 
                 // nothing to investigate unless we've failed
                 if (build.getBuildStatus().isSuccessful())
                     return;
-
-                Loggers.SERVER.info(">>>> SinCity is on!");
 
                 // identify the build problems
                 // TODO: we won't do anything about these as yet but later these could be used with a feature "only run SinCity if there are new failures"
@@ -92,30 +93,28 @@ public class BuildStatusListener
                 }
                 */
 
-                // identify the culprits (the intermediate changes)
-                final List<SVcsModification> containingChanges = build.getContainingChanges();
-
-                Loggers.SERVER.info(">>>>>>> Is historical: " + build.isOutdated());
-                Loggers.SERVER.info(">>>>>>> # changes " + containingChanges.size());
-                Loggers.SERVER.info(">>>>>>> Failed build after change " + containingChanges.get(0).getDescription());
-
 
                 if (containingChanges.size() <= 1)
                     return;
 
-                // do not repeat the run for the last revision
-                containingChanges.remove(0);
+                Loggers.SERVER.info("[SinCity] will look for culprit");
+//                Loggers.SERVER.info(">>>>>>> Is historical: " + build.isOutdated());
+//                Loggers.SERVER.info(">>>>>>> # changes " + containingChanges.size());
+//                Loggers.SERVER.info(">>>>>>> Failed build after change " + containingChanges.get(0).getDescription());
 
-                Collections.reverse(containingChanges);
+                // create a list of suspects
+                List<SVcsModification> suspectChanges = new ArrayList<SVcsModification>(containingChanges);
+                suspectChanges.remove(0);
+                Collections.reverse(suspectChanges);
 
                 BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(buildType, null);
                 for (SVcsModification change : containingChanges) {
-                    Loggers.SERVER.info(">>> Queueing change " + change.getDescription() + " having failed build " + build.getBuildNumber());
+                    Loggers.SERVER.info("[SinCity] Queueing change " + change.getDescription() + " having failed build " + build.getBuildNumber());
                     buildCustomizer.setChangesUpTo(change);
                     Map<String, String> parameters = new HashMap<String, String>();
                     parameters.put("triggered.by.sin.city", build.getBuildNumber());
                     buildCustomizer.setParameters(parameters);
-                    buildCustomizer.createPromotion().addToQueue("SinCity, rerun of " + build.getBuildNumber());
+                    buildCustomizer.createPromotion().addToQueue("SinCity, rerun of " + build.getBuildDescription());
                 }
             }
 
