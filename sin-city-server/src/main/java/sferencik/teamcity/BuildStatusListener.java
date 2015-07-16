@@ -50,7 +50,9 @@ public class BuildStatusListener
                     return;
 
                 for (SBuildFeatureDescriptor feature : buildType.getBuildFeatures()) {
-                    if (feature.getClass().equals(SinCityBuildFeature.class)) {
+                    final Class<? extends BuildFeature> featureClass = feature.getBuildFeature().getClass();
+                    Loggers.SERVER.debug("[SinCity] found plugin: " + featureClass);
+                    if (featureClass.equals(SinCityBuildFeature.class)) {
                         buildFinishedWithSinCity(build, buildType, feature, containingChanges);
                         break; // for now we only allow a single SinCity feature (see SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed())
                     }
