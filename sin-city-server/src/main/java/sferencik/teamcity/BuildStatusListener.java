@@ -93,7 +93,6 @@ public class BuildStatusListener
                 }
                 */
 
-
                 if (containingChanges.size() <= 1)
                     return;
 
@@ -108,7 +107,7 @@ public class BuildStatusListener
                 Collections.reverse(suspectChanges);
 
                 BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(buildType, null);
-                for (SVcsModification change : containingChanges) {
+                for (SVcsModification change : suspectChanges) {
                     Loggers.SERVER.info("[SinCity] Queueing change " + change.getDescription() + " having failed build " + build.getBuildNumber());
                     buildCustomizer.setChangesUpTo(change);
                     Map<String, String> parameters = new HashMap<String, String>();
