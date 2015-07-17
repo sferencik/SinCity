@@ -41,4 +41,11 @@ jsp:useBean id="keys" class="GraphiteServerKeyNames"/
     <span class="smallNote">If specified, non-SinCity builds will be tagged with this</span>
   </td>
 </tr>
+<tr>
+  <th>Trigger on any test failure</th>
+  <td>
+    <props:checkboxProperty name="isTriggerOnAnyTestFailure"/>
+    <span class="smallNote">If unchecked, culprit-finding builds are triggered only if there is a new build problem or a <em>new</em> test failure. If checked, culprit-finding builds is triggered if there is a new build problem or <em>any</em> test failure.</span>
+  </td>
+</tr>
 </l:settingsGroup>
