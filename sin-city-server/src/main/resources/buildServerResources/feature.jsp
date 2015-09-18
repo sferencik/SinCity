@@ -19,9 +19,7 @@
     */
   --%>
 
-<%--
-jsp:useBean id="keys" class="sferencik.teamcity.sincity.BuildStatusListener"/
---%>
+<jsp:useBean id="keys" class="sferencik.teamcity.sincity.SettingNames"/>
 
 <tr>
     <td colspan="2">Specify SinCity details</td>
@@ -30,21 +28,21 @@ jsp:useBean id="keys" class="sferencik.teamcity.sincity.BuildStatusListener"/
     <tr>
         <th>Tag for SinCity builds<l:star/></th>
         <td>
-            <props:textProperty name="sinCityTag"/>
+            <props:textProperty name="${keys.sinCityTag}"/>
             <span class="smallNote">If specified, SinCity builds will be tagged with this</span>
         </td>
     </tr>
     <tr>
         <th>Tag for non-SinCity builds<l:star/></th>
         <td>
-            <props:textProperty name="nonSinCityTag"/>
+            <props:textProperty name="${keys.nonSinCityTag}"/>
             <span class="smallNote">If specified, non-SinCity builds will be tagged with this</span>
         </td>
     </tr>
     <tr>
         <th>Trigger on any test failure</th>
         <td>
-            <props:checkboxProperty name="isTriggerOnAnyTestFailure"/>
+            <props:checkboxProperty name="${keys.isTriggerOnAnyTestFailure}"/>
             <span class="smallNote">If unchecked, culprit-finding builds are triggered only if there is a new build problem or a <em>new</em> test failure. If checked, culprit-finding builds is triggered if there is a new build problem or <em>any</em> test failure.</span>
         </td>
     </tr>

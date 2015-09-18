@@ -88,9 +88,10 @@ public class BuildStatusListener
             private void tagBuild(SRunningBuild thisBuild, SBuildFeatureDescriptor sinCityFeature) {
                 // tag the finished build
                 final String triggeredBySinCityParameterValue = thisBuild.getParametersProvider().get(SINCITY_RANGE_TOP_BUILD_ID);
+                SettingNames settingNames = new SettingNames();
                 String tagParameterName = triggeredBySinCityParameterValue == null
-                        ? "nonSinCityTag"
-                        : "sinCityTag";
+                        ? settingNames.getNonSinCityTag()
+                        : settingNames.getSinCityTag();
                 final String tagName = sinCityFeature.getParameters().get(tagParameterName);
 
                 if (tagName == null || tagName.isEmpty())
@@ -139,7 +140,7 @@ public class BuildStatusListener
             }
 
             private boolean isTriggerOnAnyTestFailure(SBuildFeatureDescriptor feature) {
-                final String isTriggerOnAnyTestFailureString = feature.getParameters().get("isTriggerOnAnyTestFailure");
+                final String isTriggerOnAnyTestFailureString = feature.getParameters().get(new SettingNames().getIsTriggerOnAnyTestFailure());
                 return isTriggerOnAnyTestFailureString == null
                         ? false
                         : Boolean.valueOf(isTriggerOnAnyTestFailureString);
