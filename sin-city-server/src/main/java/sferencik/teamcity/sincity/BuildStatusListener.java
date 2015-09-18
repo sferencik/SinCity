@@ -30,13 +30,17 @@ import java.util.*;
 
 public class BuildStatusListener
 {
+
+    public static final String SINCITY_RANGE_TOP_BUILD_ID = "sincity.range.top.build.id";
+    public static final String SINCITY_RANGE_TOP_BUILD_NUMBER = "sincity.range.top.build.number";
+    public static final String SINCITY_RANGE_BOTTOM_BUILD_ID = "sincity.range.bottom.build.id";
+    public static final String SINCITY_RANGE_BOTTOM_BUILD_NUMBER = "sincity.range.bottom.build.number";
+
     public BuildStatusListener(@NotNull final EventDispatcher<BuildServerListener> listener,
                                final BuildCustomizerFactory buildCustomizerFactory)
     {
         listener.addListener(new BuildServerAdapter()
         {
-            private String triggeredBySinCityParameterName = "triggered.by.sin.city";
-
             @Override
             public void buildFinished(@NotNull SRunningBuild build)
             {
@@ -83,7 +87,7 @@ public class BuildStatusListener
 
             private void tagBuild(SRunningBuild thisBuild, SBuildFeatureDescriptor sinCityFeature) {
                 // tag the finished build
-                final String triggeredBySinCityParameterValue = thisBuild.getParametersProvider().get(triggeredBySinCityParameterName);
+                final String triggeredBySinCityParameterValue = thisBuild.getParametersProvider().get(SINCITY_RANGE_TOP_BUILD_ID);
                 String tagParameterName = triggeredBySinCityParameterValue == null
                         ? "nonSinCityTag"
                         : "sinCityTag";
@@ -169,10 +173,10 @@ public class BuildStatusListener
                     buildCustomizer.setChangesUpTo(change);
 
                     Map<String, String> parameters = new HashMap<String, String>();
-                    parameters.put("sincity.range.top.build.id", String.valueOf(thisBuild.getBuildId()));
-                    parameters.put("sincity.range.top.build.number", thisBuild.getBuildNumber());
-                    parameters.put("sincity.range.bottom.build.id", String.valueOf(previousBuild.getBuildId()));
-                    parameters.put("sincity.range.bottom.build.number", previousBuild.getBuildNumber());
+                    parameters.put(SINCITY_RANGE_TOP_BUILD_ID, String.valueOf(thisBuild.getBuildId()));
+                    parameters.put(SINCITY_RANGE_TOP_BUILD_NUMBER, thisBuild.getBuildNumber());
+                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_ID, String.valueOf(previousBuild.getBuildId()));
+                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_NUMBER, previousBuild.getBuildNumber());
                     buildCustomizer.setParameters(parameters);
 
                     buildCustomizer.createPromotion().addToQueue("SinCity, failures of " + thisBuild.getBuildNumber());

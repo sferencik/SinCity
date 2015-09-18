@@ -20,32 +20,32 @@
   --%>
 
 <%--
-jsp:useBean id="keys" class="GraphiteServerKeyNames"/
+jsp:useBean id="keys" class="sferencik.teamcity.sincity.BuildStatusListener"/
 --%>
 
 <tr>
-  <td colspan="2">Specify SinCity details</td>
+    <td colspan="2">Specify SinCity details</td>
 </tr>
 <l:settingsGroup title="SinCity parameters">
-<tr>
-  <th>Tag for SinCity builds<l:star/></th>
-  <td>
-    <props:textProperty name="sinCityTag"/>
-    <span class="smallNote">If specified, SinCity builds will be tagged with this</span>
-  </td>
-</tr>
-<tr>
-  <th>Tag for non-SinCity builds<l:star/></th>
-  <td>
-    <props:textProperty name="nonSinCityTag"/>
-    <span class="smallNote">If specified, non-SinCity builds will be tagged with this</span>
-  </td>
-</tr>
-<tr>
-  <th>Trigger on any test failure</th>
-  <td>
-    <props:checkboxProperty name="isTriggerOnAnyTestFailure"/>
-    <span class="smallNote">If unchecked, culprit-finding builds are triggered only if there is a new build problem or a <em>new</em> test failure. If checked, culprit-finding builds is triggered if there is a new build problem or <em>any</em> test failure.</span>
-  </td>
-</tr>
+    <tr>
+        <th>Tag for SinCity builds<l:star/></th>
+        <td>
+            <props:textProperty name="sinCityTag"/>
+            <span class="smallNote">If specified, SinCity builds will be tagged with this</span>
+        </td>
+    </tr>
+    <tr>
+        <th>Tag for non-SinCity builds<l:star/></th>
+        <td>
+            <props:textProperty name="nonSinCityTag"/>
+            <span class="smallNote">If specified, non-SinCity builds will be tagged with this</span>
+        </td>
+    </tr>
+    <tr>
+        <th>Trigger on any test failure</th>
+        <td>
+            <props:checkboxProperty name="isTriggerOnAnyTestFailure"/>
+            <span class="smallNote">If unchecked, culprit-finding builds are triggered only if there is a new build problem or a <em>new</em> test failure. If checked, culprit-finding builds is triggered if there is a new build problem or <em>any</em> test failure.</span>
+        </td>
+    </tr>
 </l:settingsGroup>
