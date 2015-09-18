@@ -56,27 +56,28 @@ public class BuildStatusListener
                 for (SBuildFeatureDescriptor feature : buildType.getBuildFeatures()) {
                     final Class<? extends BuildFeature> featureClass = feature.getBuildFeature().getClass();
                     Loggers.SERVER.debug("[SinCity] found plugin: " + featureClass);
-                    if (featureClass.equals(SinCityBuildFeature.class)) {
-                        tagBuild(build, feature);
-                        if (build.getBuildStatus().isSuccessful()) {
-                            Loggers.SERVER.debug("[SinCity] the build succeeded; we're done.");
-                            return;
-                        }
-                        if (containingChanges.size() <= 1) {
-                            Loggers.SERVER.debug("[SinCity] no intermediate changes found; we're done.");
-                            return;
-                        }
+                    if (!featureClass.equals(SinCityBuildFeature.class))
+                        continue;
 
-                        if (getNewProblems(build, previousBuild).isEmpty()
-                                && getRelevantTestFailures(build, previousBuild, feature).isEmpty()) {
-                            Loggers.SERVER.debug("[SinCity] no new failures; we're done.");
-                            return;
-                        }
-
-                        triggerCulpritFinding(buildType, build, containingChanges);
-
-                        break; // for now we only allow a single SinCity feature (see SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed())
+                    tagBuild(build, feature);
+                    if (build.getBuildStatus().isSuccessful()) {
+                        Loggers.SERVER.debug("[SinCity] the build succeeded; we're done.");
+                        return;
                     }
+                    if (containingChanges.size() <= 1) {
+                        Loggers.SERVER.debug("[SinCity] no intermediate changes found; we're done.");
+                        return;
+                    }
+
+                    if (getNewProblems(build, previousBuild).isEmpty()
+                            && getRelevantTestFailures(build, previousBuild, feature).isEmpty()) {
+                        Loggers.SERVER.debug("[SinCity] no new failures; we're done.");
+                        return;
+                    }
+
+                    triggerCulpritFinding(buildType, build, previousBuild, containingChanges);
+
+                    break; // for now we only allow a single SinCity feature (see SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed())
                 }
             }
 
@@ -87,12 +88,14 @@ public class BuildStatusListener
                         ? "nonSinCityTag"
                         : "sinCityTag";
                 final String tagName = sinCityFeature.getParameters().get(tagParameterName);
-                if (tagName != null && !tagName.isEmpty()) {
-                    Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");
-                    final List<String> resultingTags = new ArrayList<String>(thisBuild.getTags());
-                    resultingTags.add(tagName);
-                    thisBuild.setTags(resultingTags);
-                }
+
+                if (tagName == null || tagName.isEmpty())
+                    return;
+
+                Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");
+                final List<String> resultingTags = new ArrayList<String>(thisBuild.getTags());
+                resultingTags.add(tagName);
+                thisBuild.setTags(resultingTags);
             }
 
             private List<BuildProblemData> getNewProblems(
@@ -150,6 +153,7 @@ public class BuildStatusListener
             private void triggerCulpritFinding(
                     SBuildType buildType,
                     SRunningBuild thisBuild,
+                    SFinishedBuild previousBuild,
                     List<SVcsModification> containingChanges)
             {
                 Loggers.SERVER.info("[SinCity] will look for culprit");
@@ -161,10 +165,16 @@ public class BuildStatusListener
                 BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(buildType, null);
                 for (SVcsModification change : suspectChanges) {
                     Loggers.SERVER.info("[SinCity] Queueing change '" + change + "' having failed build " + thisBuild);
+
                     buildCustomizer.setChangesUpTo(change);
+
                     Map<String, String> parameters = new HashMap<String, String>();
-                    parameters.put("triggered.by.sin.city", thisBuild.getBuildNumber());
+                    parameters.put("sincity.range.top.build.id", String.valueOf(thisBuild.getBuildId()));
+                    parameters.put("sincity.range.top.build.number", thisBuild.getBuildNumber());
+                    parameters.put("sincity.range.bottom.build.id", String.valueOf(previousBuild.getBuildId()));
+                    parameters.put("sincity.range.bottom.build.number", previousBuild.getBuildNumber());
                     buildCustomizer.setParameters(parameters);
+
                     buildCustomizer.createPromotion().addToQueue("SinCity, failures of " + thisBuild.getBuildNumber());
                 }
             }
