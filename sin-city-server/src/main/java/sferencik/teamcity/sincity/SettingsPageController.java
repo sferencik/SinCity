@@ -16,7 +16,7 @@
 */
 
 
-package sferencik.teamcity;
+package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;

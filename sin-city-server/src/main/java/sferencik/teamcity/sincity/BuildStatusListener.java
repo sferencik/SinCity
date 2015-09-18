@@ -15,7 +15,7 @@
 *    along with TeamCity Graphite.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package sferencik.teamcity;
+package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.log.Loggers;

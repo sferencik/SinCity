@@ -1,4 +1,4 @@
-package sferencik.teamcity;
+package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.serverSide.BuildFeature;
 import jetbrains.buildServer.serverSide.InvalidProperty;
