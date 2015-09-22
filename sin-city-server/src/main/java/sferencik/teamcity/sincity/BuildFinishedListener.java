@@ -92,7 +92,7 @@ public class BuildFinishedListener
             {
                 final String rbTriggerOnBuildProblem = feature.getParameters().get(new SettingNames().getRbTriggerOnBuildProblem());
 
-                if (rbTriggerOnBuildProblem == "No") {
+                if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals("No")) {
                     Loggers.SERVER.debug("[SinCity] build problems do not trigger");
                     return new ArrayList<BuildProblemData>();
                 }
@@ -100,12 +100,14 @@ public class BuildFinishedListener
                 final List<BuildProblemData> thisBuildProblems = thisBuild.getFailureReasons();
                 Loggers.SERVER.debug("[SinCity] this build's problems: " + thisBuildProblems);
 
-                if (rbTriggerOnBuildProblem == "All") {
+                if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals("All")) {
                     Loggers.SERVER.debug("[SinCity] reporting all build problems");
                     return thisBuildProblems;
                 }
 
-                final List<BuildProblemData> previousBuildProblems = previousBuild.getFailureReasons();
+                final List<BuildProblemData> previousBuildProblems = previousBuild == null
+                        ? new ArrayList<BuildProblemData>()
+                        : previousBuild.getFailureReasons();
                 Loggers.SERVER.debug("[SinCity] previous build's problems: " + previousBuildProblems);
 
                 final List<BuildProblemData> newProblems = new ArrayList<BuildProblemData>(thisBuildProblems);
@@ -123,7 +125,7 @@ public class BuildFinishedListener
             {
                 String rbTriggerOnTestFailure = feature.getParameters().get(new SettingNames().getRbTriggerOnTestFailure());
 
-                if (rbTriggerOnTestFailure == "No") {
+                if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals("No")) {
                     Loggers.SERVER.debug("[SinCity] test failures do not trigger");
                     return new ArrayList<TestName>();
                 }
@@ -131,12 +133,14 @@ public class BuildFinishedListener
                 final List<TestName> thisBuildTestFailures = getTestNames(thisBuild.getTestMessages(0, -1));
                 Loggers.SERVER.debug("[SinCity] this build's test failures: " + thisBuildTestFailures);
 
-                if (rbTriggerOnTestFailure == "All") {
+                if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals("All")) {
                     Loggers.SERVER.debug("[SinCity] reporting all test failures");
                     return thisBuildTestFailures;
                 }
 
-                final List<TestName> previousBuildTestFailures = getTestNames(previousBuild.getTestMessages(0, -1));
+                final List<TestName> previousBuildTestFailures = previousBuild == null
+                        ? new ArrayList<TestName>()
+                        : getTestNames(previousBuild.getTestMessages(0, -1));
                 Loggers.SERVER.debug("[SinCity] previous build's test failures: " + thisBuildTestFailures);
 
                 final List<TestName> relevantTestFailures = new ArrayList<TestName>(thisBuildTestFailures);
@@ -177,8 +181,12 @@ public class BuildFinishedListener
                     Map<String, String> parameters = new HashMap<String, String>();
                     parameters.put(SINCITY_RANGE_TOP_BUILD_ID, String.valueOf(thisBuild.getBuildId()));
                     parameters.put(SINCITY_RANGE_TOP_BUILD_NUMBER, thisBuild.getBuildNumber());
-                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_ID, String.valueOf(previousBuild.getBuildId()));
-                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_NUMBER, previousBuild.getBuildNumber());
+                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_ID, previousBuild == null
+                            ? "n/a"
+                            : String.valueOf(previousBuild.getBuildId()));
+                    parameters.put(SINCITY_RANGE_BOTTOM_BUILD_NUMBER, previousBuild == null
+                            ? "n/a"
+                            : previousBuild.getBuildNumber());
                     buildCustomizer.setParameters(parameters);
 
                     buildCustomizer.createPromotion().addToQueue("SinCity, failures of " + thisBuild.getBuildNumber());
