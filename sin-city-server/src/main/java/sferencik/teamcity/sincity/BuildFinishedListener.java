@@ -1,20 +1,3 @@
-/*
-*    This file is part of TeamCity Graphite.
-*
-*    TeamCity Graphite is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation, either version 3 of the License, or
-*    (at your option) any later version.
-*
-*    TeamCity Graphite is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with TeamCity Graphite.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.BuildProblemData;
@@ -28,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class BuildStatusListener
+public class BuildFinishedListener
 {
 
     public static final String SINCITY_RANGE_TOP_BUILD_ID = "sincity.range.top.build.id";
@@ -36,15 +19,14 @@ public class BuildStatusListener
     public static final String SINCITY_RANGE_BOTTOM_BUILD_ID = "sincity.range.bottom.build.id";
     public static final String SINCITY_RANGE_BOTTOM_BUILD_NUMBER = "sincity.range.bottom.build.number";
 
-    public BuildStatusListener(@NotNull final EventDispatcher<BuildServerListener> listener,
-                               final BuildCustomizerFactory buildCustomizerFactory)
+    public BuildFinishedListener(@NotNull final EventDispatcher<BuildServerListener> listener,
+                                 final BuildCustomizerFactory buildCustomizerFactory)
     {
         listener.addListener(new BuildServerAdapter()
         {
             @Override
             public void buildFinished(@NotNull SRunningBuild build)
             {
-
                 Loggers.SERVER.debug("[SinCity] build: " + build);
 
                 final SBuildType buildType = build.getBuildType();
@@ -73,9 +55,9 @@ public class BuildStatusListener
                         return;
                     }
 
-                    if (getNewProblems(build, previousBuild).isEmpty()
+                    if (getRelevantBuildProblems(build, previousBuild, feature).isEmpty()
                             && getRelevantTestFailures(build, previousBuild, feature).isEmpty()) {
-                        Loggers.SERVER.debug("[SinCity] no new failures; we're done.");
+                        Loggers.SERVER.debug("[SinCity] no relevant failures; we're done.");
                         return;
                     }
 
@@ -90,8 +72,8 @@ public class BuildStatusListener
                 final String triggeredBySinCityParameterValue = thisBuild.getParametersProvider().get(SINCITY_RANGE_TOP_BUILD_ID);
                 SettingNames settingNames = new SettingNames();
                 String tagParameterName = triggeredBySinCityParameterValue == null
-                        ? settingNames.getNonSinCityTag()
-                        : settingNames.getSinCityTag();
+                        ? settingNames.getTagNameForBuildsNotTriggeredBySinCity()
+                        : settingNames.getTagNameForBuildsTriggeredBySinCity();
                 final String tagName = sinCityFeature.getParameters().get(tagParameterName);
 
                 if (tagName == null || tagName.isEmpty())
@@ -103,19 +85,33 @@ public class BuildStatusListener
                 thisBuild.setTags(resultingTags);
             }
 
-            private List<BuildProblemData> getNewProblems(
+            private List<BuildProblemData> getRelevantBuildProblems(
                     SRunningBuild thisBuild,
-                    SFinishedBuild previousBuild)
+                    SFinishedBuild previousBuild,
+                    SBuildFeatureDescriptor feature)
             {
+                final String rbTriggerOnBuildProblem = feature.getParameters().get(new SettingNames().getRbTriggerOnBuildProblem());
+
+                if (rbTriggerOnBuildProblem == "No") {
+                    Loggers.SERVER.debug("[SinCity] build problems do not trigger");
+                    return new ArrayList<BuildProblemData>();
+                }
+
                 final List<BuildProblemData> thisBuildProblems = thisBuild.getFailureReasons();
                 Loggers.SERVER.debug("[SinCity] this build's problems: " + thisBuildProblems);
+
+                if (rbTriggerOnBuildProblem == "All") {
+                    Loggers.SERVER.debug("[SinCity] reporting all build problems");
+                    return thisBuildProblems;
+                }
 
                 final List<BuildProblemData> previousBuildProblems = previousBuild.getFailureReasons();
                 Loggers.SERVER.debug("[SinCity] previous build's problems: " + previousBuildProblems);
 
                 final List<BuildProblemData> newProblems = new ArrayList<BuildProblemData>(thisBuildProblems);
                 newProblems.removeAll(previousBuildProblems);
-                Loggers.SERVER.debug("[SinCity] new problems: " + newProblems);
+                Loggers.SERVER.debug("[SinCity] new build problems: " + newProblems);
+                Loggers.SERVER.debug("[SinCity] reporting new build problems");
 
                 return newProblems;
             }
@@ -125,25 +121,30 @@ public class BuildStatusListener
                     SFinishedBuild previousBuild,
                     SBuildFeatureDescriptor feature)
             {
+                String rbTriggerOnTestFailure = feature.getParameters().get(new SettingNames().getRbTriggerOnTestFailure());
+
+                if (rbTriggerOnTestFailure == "No") {
+                    Loggers.SERVER.debug("[SinCity] test failures do not trigger");
+                    return new ArrayList<TestName>();
+                }
+
                 final List<TestName> thisBuildTestFailures = getTestNames(thisBuild.getTestMessages(0, -1));
                 Loggers.SERVER.debug("[SinCity] this build's test failures: " + thisBuildTestFailures);
+
+                if (rbTriggerOnTestFailure == "All") {
+                    Loggers.SERVER.debug("[SinCity] reporting all test failures");
+                    return thisBuildTestFailures;
+                }
 
                 final List<TestName> previousBuildTestFailures = getTestNames(previousBuild.getTestMessages(0, -1));
                 Loggers.SERVER.debug("[SinCity] previous build's test failures: " + thisBuildTestFailures);
 
                 final List<TestName> relevantTestFailures = new ArrayList<TestName>(thisBuildTestFailures);
-                if (!isTriggerOnAnyTestFailure(feature))
-                    relevantTestFailures.removeAll(previousBuildTestFailures);
+                relevantTestFailures.removeAll(previousBuildTestFailures);
                 Loggers.SERVER.debug("[SinCity] relevant test failures: " + relevantTestFailures);
+                Loggers.SERVER.debug("[SinCity] reporting new test failures");
 
                 return relevantTestFailures;
-            }
-
-            private boolean isTriggerOnAnyTestFailure(SBuildFeatureDescriptor feature) {
-                final String isTriggerOnAnyTestFailureString = feature.getParameters().get(new SettingNames().getIsTriggerOnAnyTestFailure());
-                return isTriggerOnAnyTestFailureString == null
-                        ? false
-                        : Boolean.valueOf(isTriggerOnAnyTestFailureString);
             }
 
             private List<TestName> getTestNames(List<TestInfo> tests)

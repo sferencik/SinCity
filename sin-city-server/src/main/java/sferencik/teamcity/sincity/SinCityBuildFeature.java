@@ -14,7 +14,6 @@ import java.util.Map;
 
 public class SinCityBuildFeature extends BuildFeature {
     private final PluginDescriptor descriptor;
-    public static String FEATURE_TYPE = "SinCity";
 
     public SinCityBuildFeature(@NotNull final PluginDescriptor descriptor) {
         this.descriptor = descriptor;
@@ -23,7 +22,7 @@ public class SinCityBuildFeature extends BuildFeature {
     @NotNull
     @Override
     public String getType() {
-        return FEATURE_TYPE;
+        return "SinCity";
     }
 
     @NotNull
@@ -55,13 +54,8 @@ public class SinCityBuildFeature extends BuildFeature {
             @NotNull
             public Collection<InvalidProperty> process(@Nullable final Map<String, String> propertiesMap)
             {
-                final Collection<InvalidProperty> result = new ArrayList<InvalidProperty>();
-                if (propertiesMap == null)
-                {
-                    return result;
-                }
-
-                return result;
+                // anything goes
+                return new ArrayList<InvalidProperty>();
             }
         };
     }
@@ -70,8 +64,7 @@ public class SinCityBuildFeature extends BuildFeature {
     @Override
     public Map<String, String> getDefaultParameters()
     {
-        final Map<String, String> map = new HashMap<String, String>();
-        return map;
+        return new HashMap<String, String>();
     }
 
     @Override

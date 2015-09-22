@@ -28,22 +28,33 @@
     <tr>
         <th>Tag for SinCity builds<l:star/></th>
         <td>
-            <props:textProperty name="${keys.sinCityTag}"/>
-            <span class="smallNote">If specified, SinCity builds will be tagged with this</span>
+            <props:textProperty name="${keys.tagNameForBuildsTriggeredBySinCity}"/>
+            <span class="smallNote">If specified, builds triggered by SinCity will be tagged with this</span>
         </td>
     </tr>
     <tr>
         <th>Tag for non-SinCity builds<l:star/></th>
         <td>
-            <props:textProperty name="${keys.nonSinCityTag}"/>
-            <span class="smallNote">If specified, non-SinCity builds will be tagged with this</span>
+            <props:textProperty name="${keys.tagNameForBuildsNotTriggeredBySinCity}"/>
+            <span class="smallNote">If specified, builds <em>not</em> triggered by SinCity will be tagged with this</span>
         </td>
     </tr>
     <tr>
-        <th>Trigger on any test failure</th>
+        <th>Trigger on build problems</th>
         <td>
-            <props:checkboxProperty name="${keys.isTriggerOnAnyTestFailure}"/>
-            <span class="smallNote">If unchecked, culprit-finding builds are triggered only if there is a new build problem or a <em>new</em> test failure. If checked, culprit-finding builds is triggered if there is a new build problem or <em>any</em> test failure.</span>
+            <props:radioButtonProperty name="${keys.rbTriggerOnBuildProblem}" value="No" /> no
+            <props:radioButtonProperty name="${keys.rbTriggerOnBuildProblem}" value="New" /> new (default)
+            <props:radioButtonProperty name="${keys.rbTriggerOnBuildProblem}" value="All" /> all
+            <span class="smallNote">Should culprit finding builds be kicked on build problems (e.g. non-zero exit code)?</span>
+        </td>
+    </tr>
+    <tr>
+        <th>Trigger on test failures</th>
+        <td>
+            <props:radioButtonProperty name="${keys.rbTriggerOnTestFailure}" value="No" /> no
+            <props:radioButtonProperty name="${keys.rbTriggerOnTestFailure}" value="New" /> new (default)
+            <props:radioButtonProperty name="${keys.rbTriggerOnTestFailure}" value="All" /> all
+            <span class="smallNote">Should culprit finding builds be kicked on test failures?</span>
         </td>
     </tr>
 </l:settingsGroup>
