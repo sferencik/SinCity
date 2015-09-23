@@ -62,6 +62,16 @@ options are:
 Setting both options to "No" is effectively the same as disabling culprit-finding completely (except that completed
 builds will still be tagged as per above).
 
+#### Parameters: tell each culprit-finding build what it's investigating
+
+You can tell each triggered culprit-finding build what failures it is "investigating." This is passed down in the form
+of two build parameters, one for each kind of failure described above (high-level build problems, individual test
+failures). Enable this feature by checking the respective checkboxes.
+
+This can be useful to help your build focus on the failures. For example, your build may be able to run the failed tests
+first. Or to run *only* the failed tests. To find what the failures are, the build configuration must do its own parsing
+of the two JSON-string parameters.
+
 ## Future improvements
 
 * binary search - maybe

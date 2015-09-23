@@ -10,6 +10,7 @@ import jetbrains.buildServer.tests.TestInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.vcs.SVcsModification;
 import org.jetbrains.annotations.NotNull;
+import sferencik.teamcity.sincity.json.Encoder;
 
 import java.util.*;
 
@@ -180,8 +181,22 @@ public class SinCity {
         parameters.put(parameterNames.getSincityRangeBottomBuildNumber(), oldBuild == null
                 ? "n/a"
                 : oldBuild.getBuildNumber());
+        if (isSetBuildProblemJsonParameter())
+            parameters.put(parameterNames.getSincityBuildProblems(), Encoder.encodeBuildProblems(getRelevantBuildProblems()));
+        if (isSetTestFailureJsonParameter())
+            parameters.put(parameterNames.getSincityTestFailures(), Encoder.encodeTestNames(getRelevantTestFailures()));
         buildCustomizer.setParameters(parameters);
 
         return buildCustomizer;
+    }
+
+    private boolean isSetBuildProblemJsonParameter() {
+        final String setBuildProblemJsonParameterAsString = sinCityParameters.get(new SettingNames().getCbSetBuildProblemJsonParameter());
+        return setBuildProblemJsonParameterAsString != null && Boolean.valueOf(setBuildProblemJsonParameterAsString);
+    }
+
+    private boolean isSetTestFailureJsonParameter() {
+        final String setTestFailureJsonParameterAsString = sinCityParameters.get(new SettingNames().getCbSetTestFailureJsonParameter());
+        return setTestFailureJsonParameterAsString != null && Boolean.valueOf(setTestFailureJsonParameterAsString);
     }
 }

@@ -16,4 +16,12 @@ public class SettingNames {
     public String getRbTriggerOnTestFailure() {
         return "sincity.rbTriggerOnTestFailure";
     }
+
+    public String getCbSetBuildProblemJsonParameter() {
+        return "sincity.cbSetBuildProblemJsonParameter";
+    }
+
+    public String getCbSetTestFailureJsonParameter() {
+        return "sincity.cbSetTestFailureJsonParameter";
+    }
 }
