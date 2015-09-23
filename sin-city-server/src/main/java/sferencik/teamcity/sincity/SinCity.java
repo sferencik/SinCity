@@ -2,7 +2,10 @@ package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.*;
+import jetbrains.buildServer.serverSide.BuildCustomizer;
+import jetbrains.buildServer.serverSide.BuildCustomizerFactory;
+import jetbrains.buildServer.serverSide.SFinishedBuild;
+import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.tests.TestInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.vcs.SVcsModification;
@@ -11,10 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class SinCity {
-    public static final String SINCITY_RANGE_TOP_BUILD_ID = "sincity.range.top.build.id";
-    public static final String SINCITY_RANGE_TOP_BUILD_NUMBER = "sincity.range.top.build.number";
-    public static final String SINCITY_RANGE_BOTTOM_BUILD_ID = "sincity.range.bottom.build.id";
-    public static final String SINCITY_RANGE_BOTTOM_BUILD_NUMBER = "sincity.range.bottom.build.number";
 
     private final SRunningBuild newBuild;
     private final SFinishedBuild oldBuild;
@@ -41,7 +40,7 @@ public class SinCity {
     void tagBuild() {
         // tag the finished build
         SettingNames settingNames = new SettingNames();
-        String tagParameterName = newBuild.getParametersProvider().get(SinCity.SINCITY_RANGE_TOP_BUILD_ID) == null
+        String tagParameterName = newBuild.getParametersProvider().get(new ParameterNames().getSincityRangeTopBuildId()) == null
                 ? settingNames.getTagNameForBuildsNotTriggeredBySinCity()
                 : settingNames.getTagNameForBuildsTriggeredBySinCity();
         final String tagName = sinCityParameters.get(tagParameterName);
@@ -130,7 +129,7 @@ public class SinCity {
         final List<TestName> previousBuildTestFailures = oldBuild == null
                 ? new ArrayList<TestName>()
                 : getTestNames(oldBuild.getTestMessages(0, -1));
-        Loggers.SERVER.debug("[SinCity] previous build's test failures: " + thisBuildTestFailures);
+        Loggers.SERVER.debug("[SinCity] previous build's test failures: " + previousBuildTestFailures);
 
         final List<TestName> relevantTestFailures = new ArrayList<TestName>(thisBuildTestFailures);
         relevantTestFailures.removeAll(previousBuildTestFailures);
@@ -162,7 +161,8 @@ public class SinCity {
 
             buildCustomizer.setChangesUpTo(change);
 
-            buildCustomizer.createPromotion().addToQueue("SinCity, failures of " + newBuild.getBuildNumber());
+            buildCustomizer.createPromotion().addToQueue(
+                    "SinCity; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
         }
     }
 
@@ -171,12 +171,13 @@ public class SinCity {
         BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(newBuild.getBuildType(), null);
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(SinCity.SINCITY_RANGE_TOP_BUILD_ID, String.valueOf(newBuild.getBuildId()));
-        parameters.put(SinCity.SINCITY_RANGE_TOP_BUILD_NUMBER, newBuild.getBuildNumber());
-        parameters.put(SinCity.SINCITY_RANGE_BOTTOM_BUILD_ID, oldBuild == null
+        final ParameterNames parameterNames = new ParameterNames();
+        parameters.put(parameterNames.getSincityRangeTopBuildId(), String.valueOf(newBuild.getBuildId()));
+        parameters.put(parameterNames.getSincityRangeTopBuildNumber(), newBuild.getBuildNumber());
+        parameters.put(parameterNames.getSincityRangeBottomBuildId(), oldBuild == null
                 ? "n/a"
                 : String.valueOf(oldBuild.getBuildId()));
-        parameters.put(SinCity.SINCITY_RANGE_BOTTOM_BUILD_NUMBER, oldBuild == null
+        parameters.put(parameterNames.getSincityRangeBottomBuildNumber(), oldBuild == null
                 ? "n/a"
                 : oldBuild.getBuildNumber());
         buildCustomizer.setParameters(parameters);

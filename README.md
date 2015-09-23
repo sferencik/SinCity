@@ -16,15 +16,15 @@ understaffed, e.g. if for some reason it is confined to a single special agent).
 daily trigger rather than a VCS one.
 
 In all these cases, change grouping is desirable and positive - until someone breaks the build. When that happens (which
-is hopefully rare), you typically *do* want to  build each suspect change individually. The plugin assumes that this is
-possible.
+is hopefully rare), you typically *do* want to build each suspect change individually. The plugin assumes that this is
+possible (i.e. the culprit-finding builds are possible and not prohibitively expensive).
 
 ## Mechanics: how it works
 
-When a build fails in a build configuration with the SinCity feature enabled, and if that build covers multiple changes,
-the plugin triggers builds corresponding to the intermediate changes.
+When a build fails in a build configuration with the SinCity feature enabled, then if that build covers multiple
+changes, the plugin triggers builds corresponding to the intermediate changes.
 
-In the plugin settings, you can specify in more detail what counts as a build failure. See more in Configuration.
+In the plugin settings, you can specify in more detail what counts as a build failure. See 'Configuration' below.
 
 As of September 2015, SinCity does not perform a binary search. (For that, see the slightly different [Bisect
 plugin](https://github.com/tkirill/tc-bisect).) Instead, all the builds are queued at the same time. In a sense, binary
@@ -32,25 +32,30 @@ search seems at odds with the basic premise set out above, namely that builds ta
 and we have 6 suspect changes to build, it's faster to run them all in parallel, rather than run just one (the middle
 one), then bisect and run another one and then another.
 
-## Configuration
+## Features and configuration
 
-To enable the plugin for a build configuration, add it as a build feature. The build-feature dialog lets you specify the
-following settings:
+To enable the plugin for a build configuration, add it as a Build feature.
 
-#### Two tags
+The build-feature dialog lets you specify the following settings:
+
+#### Tagging: tell SinCity and non-SinCity builds apart
 
 You can tag all the builds triggered by SinCity (the culprit-finding ones) as well as all the builds *not* triggered by
-SinCity. Specify the  tag names you want to use. If empty, no tagging is done.
+SinCity. Specify the tag names you want to use. If empty, no tagging is done.
 
 One of the tags is useful if you want to show only the SinCity builds; the other if you want to *hide* them from the
 view.
 
-#### What counts as failure
+#### Triggering: what counts as failure worth hunting down
 
-The plugin distinguishes between two types of failure in TeamCity: build problems (e.g. "Exit code 1") and test
-failures. For each of these, you can specify whether SinCity should trigger culprit-finding when these occur. The
+The plugin inspects a failing build for two kinds of failures:
+1. high-level build problems (e.g. Powershell runner 2 returned a non-zero exit code, Command-line runner 1 timed out,
+   There are failing tests)
+2. individual test failures (e.g. *MySuite: my.test.package.MyClass.myTest* failed)
+
+For either of these failure kinds, you can specify whether SinCity should trigger culprit-finding when they occur. The
 options are:
-* No (i.e. ignore these errors)
+* No (i.e. ignore this kind of errors)
 * New (i.e. only trigger culprit finding if this is a new error)
 * All (i.e. trigger culprit finding even if this error already occurred in the previous build)
 
