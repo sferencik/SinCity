@@ -16,4 +16,12 @@ public class ParameterNames {
     public String getSincityRangeBottomBuildNumber() {
         return "sincity.range.bottom.build.number";
     }
+
+    public String getSincityBuildProblems() {
+        return "sincity.build.problems.json";
+    }
+
+    public String getSincityTestFailures() {
+        return "sincity.test.failures.json";
+    }
 }
