@@ -14,16 +14,16 @@ import sferencik.teamcity.sincity.json.Encoder;
 
 import java.util.*;
 
-public class SinCity {
+public class CulpritFinder {
 
     private final SRunningBuild newBuild;
     private final SFinishedBuild oldBuild;
     private final BuildCustomizerFactory buildCustomizerFactory;
     private final Map<String, String> sinCityParameters;
 
-    public SinCity(SRunningBuild build,
-                   BuildCustomizerFactory buildCustomizerFactory,
-                   Map<String, String> sinCityParameters) {
+    public CulpritFinder(SRunningBuild build,
+                         BuildCustomizerFactory buildCustomizerFactory,
+                         Map<String, String> sinCityParameters) {
 
         this.newBuild = build;
         this.buildCustomizerFactory = buildCustomizerFactory;
@@ -31,28 +31,6 @@ public class SinCity {
 
         this.oldBuild = newBuild.getPreviousFinished();
         Loggers.SERVER.debug("[SinCity] previous build: " + oldBuild);
-    }
-
-    /**
-     * Tag the finishing build (if requested in the config) as either
-     * 1) triggered by SinCity
-     * 2) not triggered by SinCity
-     */
-    void tagBuild() {
-        // tag the finished build
-        SettingNames settingNames = new SettingNames();
-        String tagParameterName = newBuild.getParametersProvider().get(new ParameterNames().getSincityRangeTopBuildId()) == null
-                ? settingNames.getTagNameForBuildsNotTriggeredBySinCity()
-                : settingNames.getTagNameForBuildsTriggeredBySinCity();
-        final String tagName = sinCityParameters.get(tagParameterName);
-
-        if (tagName == null || tagName.isEmpty())
-            return;
-
-        Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");
-        final List<String> resultingTags = new ArrayList<String>(newBuild.getTags());
-        resultingTags.add(tagName);
-        newBuild.setTags(resultingTags);
     }
 
     /**

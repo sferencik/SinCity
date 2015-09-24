@@ -7,20 +7,38 @@ import org.jetbrains.annotations.NotNull;
 
 public class BuildFinishedListener
 {
-
     public BuildFinishedListener(@NotNull final EventDispatcher<BuildServerListener> listener,
                                  final BuildCustomizerFactory buildCustomizerFactory)
     {
         listener.addListener(new BuildServerAdapter()
         {
+            /**
+             * When a build is finishing, check if its build configuration has the SinCity build feature enabled. If
+             * so, tag the build as appropriate and trigger culprit finding if needed.
+             * @param build the finishing build
+             */
             @Override
             public void buildFinished(@NotNull SRunningBuild build)
             {
-                Loggers.SERVER.debug("[SinCity] build: " + build);
+                Loggers.SERVER.debug("[SinCity] build finishing: " + build);
 
+                SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
+                if (sinCityFeature == null)
+                    return;
+
+                new BuildTagger(build, sinCityFeature.getParameters()).tagBuild();
+                new CulpritFinder(build, buildCustomizerFactory, sinCityFeature.getParameters()).triggerCulpritFindingIfNeeded();
+            }
+
+            /*
+            For a given running build, look through its build type's build features and return a feature descriptor for
+            the SinCity feature if it's enabled. We only allow a single SinCity feature (see
+            SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed()) so this either returns an instance or null.
+             */
+            private SBuildFeatureDescriptor getSinCityFeature(SRunningBuild build) {
                 final SBuildType buildType = build.getBuildType();
                 if (buildType == null)
-                    return;
+                    return null;
 
                 for (SBuildFeatureDescriptor feature : buildType.getBuildFeatures()) {
                     final Class<? extends BuildFeature> featureClass = feature.getBuildFeature().getClass();
@@ -28,16 +46,12 @@ public class BuildFinishedListener
                     if (!featureClass.equals(SinCityBuildFeature.class))
                         continue;
 
-                    final SinCity sinCity = new SinCity(build, buildCustomizerFactory, feature.getParameters());
-                    sinCity.tagBuild();
-                    sinCity.triggerCulpritFindingIfNeeded();
-
-                    // we only allow a single SinCity feature (see
-                    // SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed()) so there's no point continuing
-                    break;
+                    Loggers.SERVER.debug("[SinCity] the SinCity plugin is enabled");
+                    return feature;
                 }
-            }
 
+                return null;
+            }
         });
     }
 }
