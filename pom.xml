@@ -30,6 +30,8 @@
   </build>
   <modules>
     <module>sin-city-server</module>
+    <module>sin-city-agent</module>
+    <module>sin-city-common</module>
     <module>build</module>
   </modules>
 </project>

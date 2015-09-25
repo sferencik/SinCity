@@ -10,12 +10,17 @@
          <source>target/teamcity-plugin.xml</source>
          <outputDirectory>/</outputDirectory>
      </file> 
+     <file>
+         <source>target/sin-city-agent.zip</source>
+         <outputDirectory>agent</outputDirectory>
+     </file> 
   </files>
   <moduleSets>
     <moduleSet>
        <useAllReactorProjects>true</useAllReactorProjects>
        <includes>
            <include>sferencik.teamcity:sin-city-server</include>
+           <include>sferencik.teamcity:sin-city-common</include>
        </includes> 
        <binaries>
            <outputDirectory>server</outputDirectory>

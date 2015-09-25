@@ -9,12 +9,22 @@
   <artifactId>build</artifactId>
   <packaging>pom</packaging>
   <properties>
-      <maven.build.timestamp.format>yyyyddMMHHmmss</maven.build.timestamp.format>
+      <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
       <teamcity.sin-city.plugin.version>snapshot-${maven.build.timestamp}</teamcity.sin-city.plugin.version>
       <teamcity.sin-city.plugin.vendorName>Sam Ferencik</teamcity.sin-city.plugin.vendorName>
       <teamcity.sin-city.plugin.vendorUrl>https://cz.linkedin.com/in/sferencik</teamcity.sin-city.plugin.vendorUrl>
   </properties>
   <dependencies>
+      <dependency>
+           <groupId>sferencik.teamcity</groupId>
+           <artifactId>sin-city-agent</artifactId>
+           <version>1.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+           <groupId>sferencik.teamcity</groupId>
+           <artifactId>sin-city-common</artifactId>
+           <version>1.0-SNAPSHOT</version>
+      </dependency>
       <dependency>
            <groupId>sferencik.teamcity</groupId>
            <artifactId>sin-city-server</artifactId>
@@ -58,6 +68,20 @@
             <artifactId>maven-assembly-plugin</artifactId>
             <version>2.4</version>
             <executions>
+              <execution>
+                <id>make-agent-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <finalName>sin-city-agent</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <descriptors>
+                    <descriptor>plugin-agent-assembly.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
               <execution>
                 <id>make-assembly</id>
                 <phase>package</phase>

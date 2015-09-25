@@ -3,6 +3,7 @@
 
 <jsp:useBean id="settingName" class="sferencik.teamcity.sincity.SettingNames"/>
 <jsp:useBean id="parameterName" class="sferencik.teamcity.sincity.ParameterNames"/>
+<jsp:useBean id="fileName" class="sferencik.teamcity.sincity.FileNames"/>
 
 <l:settingsGroup title="SinCity parameters">
     <tr>
@@ -49,16 +50,18 @@
                 </tr>
                 <tr>
                     <td>
-                        <props:checkboxProperty name="${settingName.cbSetBuildProblemJsonParameter}" />
-                        <code>${parameterName.sincityBuildProblems}</code><br /> <span class="smallNote">If checked, the
-                        culprit-finding builds will receive a JSON-string parameter containing a list of build problems,
-                        filtered as per the triggering rules above.</span>
+                        <props:checkboxProperty name="${settingName.cbSetBuildProblemJsonParameter}" /> send as JSON<br/>
+                        <span class="smallNote">If checked, the culprit-finding builds will receive a list of build
+                        problems as a JSON structure. This has the form of a build parameter
+                        (<code>${parameterName.sincityBuildProblems}</code>) and a JSON file (<code>&lt;build temp
+                        dir&gt;/${fileName.problemDataJsonFilename}</code>).</span>
                     </td>
                     <td>
-                        <props:checkboxProperty name="${settingName.cbSetTestFailureJsonParameter}" />
-                        <code>${parameterName.sincityTestFailures}</code><br /> <span class="smallNote">If checked, the
-                        culprit-finding builds will receive a JSON-string parameter containing a list of test failures,
-                        filtered as per the triggering rules above.</span>
+                        <props:checkboxProperty name="${settingName.cbSetTestFailureJsonParameter}" /> send as JSON<br/>
+                        <span class="smallNote">If checked, the culprit-finding builds will receive a list of test
+                        failures as a JSON structure. This has the form of a build parameter
+                        (<code>${parameterName.sincityTestFailures}</code>) and a JSON file (<code>&lt;build temp
+                        dir&gt;/${fileName.testFailureJsonFilename}</code>).</span>
                     </td>
                 </tr>
             </table>
