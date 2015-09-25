@@ -19,7 +19,7 @@ public class TestName {
         suite = Util.nullifyEmptyString(tcTestName.getSuite());
         packageName = Util.nullifyEmptyString(tcTestName.getPackageName());
         className = Util.nullifyEmptyString(tcTestName.getClassName());
-        test = Util.nullifyEmptyString(tcTestName.getShortName());
+        test = Util.nullifyEmptyString(tcTestName.getTestMethodName());
         parameters = Util.nullifyEmptyString(tcTestName.getParameters());
     }
 }
