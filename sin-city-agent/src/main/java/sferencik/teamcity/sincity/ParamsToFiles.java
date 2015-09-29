@@ -3,12 +3,7 @@ package sferencik.teamcity.sincity;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.log.Loggers;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.Map;
 
 public class ParamsToFiles {
@@ -18,14 +13,15 @@ public class ParamsToFiles {
         this.build = build;
     }
 
-    private void writeStringToFile(String string, Path filePath) {
+    private void writeStringToFile(String string, String filePath) {
         if (string == null)
             return;
 
         Loggers.AGENT.info("[SinCity] writing to " + filePath);
 
         try {
-            final BufferedWriter bufferedWriter = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8);
+            final BufferedWriter bufferedWriter = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(filePath), "UTF-8"));
             bufferedWriter.write(string);
             bufferedWriter.close();
         } catch (IOException e) {
@@ -49,12 +45,16 @@ public class ParamsToFiles {
 
         if (configParameters.containsKey(parameterNames.getSincityBuildProblems())) {
             Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityBuildProblems());
-            writeStringToFile(configParameters.get(parameterNames.getSincityBuildProblems()), Paths.get(buildTempDirectory, fileNames.getProblemDataJsonFilename()));
+            writeStringToFile(
+                    configParameters.get(parameterNames.getSincityBuildProblems()),
+                    String.valueOf(new File(new File(buildTempDirectory), fileNames.getProblemDataJsonFilename())));
         }
 
         if (configParameters.containsKey(parameterNames.getSincityTestFailures())) {
             Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityTestFailures());
-            writeStringToFile(configParameters.get(parameterNames.getSincityTestFailures()), Paths.get(buildTempDirectory, fileNames.getTestFailureJsonFilename()));
+            writeStringToFile(
+                    configParameters.get(parameterNames.getSincityTestFailures()),
+                    String.valueOf(new File(new File(buildTempDirectory), fileNames.getTestFailureJsonFilename())));
         }
     }
 }
