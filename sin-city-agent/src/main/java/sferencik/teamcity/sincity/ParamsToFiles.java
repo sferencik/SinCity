@@ -54,7 +54,7 @@ public class ParamsToFiles {
 
         if (configParameters.containsKey(parameterNames.getSincityTestFailures())) {
             Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityTestFailures());
-            writeStringToFile(configParameters.get(parameterNames.getSincityTestFailures()), Paths.get(buildTempDirectory, fileNames.getProblemDataJsonFilename()));
+            writeStringToFile(configParameters.get(parameterNames.getSincityTestFailures()), Paths.get(buildTempDirectory, fileNames.getTestFailureJsonFilename()));
         }
     }
 }
