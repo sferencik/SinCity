@@ -3,7 +3,6 @@ package sferencik.teamcity.sincity;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.AgentRunningBuild;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.EventDispatcher;
 
 public class BuildStartedListener {
@@ -11,7 +10,6 @@ public class BuildStartedListener {
     {
         listener.addListener(new AgentLifeCycleAdapter()
         {
-            AgentRunningBuild build = null;
             /**
              * When a build is starting, check if it has the SinCity JSON-string parameters defined. If so, copy these
              * to files in the agent's working directory.
@@ -28,17 +26,9 @@ public class BuildStartedListener {
              */
             @Override
             public void sourcesUpdated(AgentRunningBuild build) {
-
-                this.build = build;
-
-                final ParamsToFiles paramsToFiles = new ParamsToFiles(build);
-                if (paramsToFiles.areSinCityParametersSet()) {
-                    Loggers.AGENT.debug("[SinCity] the JSON parameters are set");
-                    paramsToFiles.store();
-                }
-                else
-                    Loggers.AGENT.debug("[SinCity] the JSON parameters are not set");
+                new ParamsToFiles(build).storeIfSet();
             }
+
         });
     }
 }

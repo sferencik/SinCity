@@ -18,25 +18,6 @@ public class ParamsToFiles {
         this.build = build;
     }
 
-    boolean areSinCityParametersSet() {
-        final ParameterNames parameterNames = new ParameterNames();
-        final Map<String, String> configParameters = build.getSharedConfigParameters();
-        return configParameters.containsKey(parameterNames.getSincityBuildProblems())
-                || configParameters.containsKey(parameterNames.getSincityTestFailures());
-    }
-
-    void store() {
-        final ParameterNames parameterNames = new ParameterNames();
-        final FileNames fileNames = new FileNames();
-
-        final Map<String, String> configParameters = build.getSharedConfigParameters();
-        String buildTempDirectory = build.getBuildTempDirectory().getAbsolutePath();
-
-        writeStringToFile(configParameters.get(parameterNames.getSincityBuildProblems()), Paths.get(buildTempDirectory, fileNames.getProblemDataJsonFilename()));
-        writeStringToFile(configParameters.get(parameterNames.getSincityTestFailures()), Paths.get(buildTempDirectory, fileNames.getTestFailureJsonFilename()));
-
-    }
-
     private void writeStringToFile(String string, Path filePath) {
         if (string == null)
             return;
@@ -51,5 +32,29 @@ public class ParamsToFiles {
             Loggers.AGENT.error("[SinCity] writing failed, " + e);
         }
 
+    }
+
+    void storeIfSet() {
+        final ParameterNames parameterNames = new ParameterNames();
+        final Map<String, String> configParameters = build.getSharedConfigParameters();
+
+        if (!configParameters.containsKey(parameterNames.getSincityBuildProblems())
+                && !configParameters.containsKey(parameterNames.getSincityTestFailures())) {
+            Loggers.AGENT.debug("[SinCity] the JSON parameters are not set");
+            return;
+        }
+
+        String buildTempDirectory = build.getBuildTempDirectory().getAbsolutePath();
+        final FileNames fileNames = new FileNames();
+
+        if (configParameters.containsKey(parameterNames.getSincityBuildProblems())) {
+            Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityBuildProblems());
+            writeStringToFile(configParameters.get(parameterNames.getSincityBuildProblems()), Paths.get(buildTempDirectory, fileNames.getProblemDataJsonFilename()));
+        }
+
+        if (configParameters.containsKey(parameterNames.getSincityTestFailures())) {
+            Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityTestFailures());
+            writeStringToFile(configParameters.get(parameterNames.getSincityTestFailures()), Paths.get(buildTempDirectory, fileNames.getProblemDataJsonFilename()));
+        }
     }
 }
