@@ -5,16 +5,33 @@ import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
 
-public class BuildFinishedListener
+public class BuildStatusListener
 {
-    public BuildFinishedListener(@NotNull final EventDispatcher<BuildServerListener> listener,
-                                 final BuildCustomizerFactory buildCustomizerFactory)
+    public BuildStatusListener(@NotNull final EventDispatcher<BuildServerListener> listener,
+                               final BuildCustomizerFactory buildCustomizerFactory)
     {
         listener.addListener(new BuildServerAdapter()
         {
             /**
-             * When a build is finishing, check if its build configuration has the SinCity build feature enabled. If
-             * so, tag the build as appropriate and trigger culprit finding if needed.
+             * When a build is starting, check if its build configuration has the SinCity build feature enabled. If so,
+             * tag the build as appropriate.
+             * @param build the starting build
+             */
+            @Override
+            public void buildStarted(@NotNull SRunningBuild build)
+            {
+                Loggers.SERVER.debug("[SinCity] build starting: " + build);
+
+                SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
+                if (sinCityFeature == null)
+                    return;
+
+                new BuildTagger(build, sinCityFeature.getParameters()).tagBuild();
+            }
+
+            /**
+             * When a build is finishing, check if its build configuration has the SinCity build feature enabled. If so,
+             * trigger culprit finding if needed.
              * @param build the finishing build
              */
             @Override
@@ -26,7 +43,6 @@ public class BuildFinishedListener
                 if (sinCityFeature == null)
                     return;
 
-                new BuildTagger(build, sinCityFeature.getParameters()).tagBuild();
                 new CulpritFinder(build, buildCustomizerFactory, sinCityFeature.getParameters()).triggerCulpritFindingIfNeeded();
             }
 

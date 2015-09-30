@@ -3,5 +3,5 @@
 <beans default-autowire="constructor">
     <bean class="sferencik.teamcity.sincity.SinCityBuildFeature" />
     <bean class="sferencik.teamcity.sincity.SettingsPageController" />
-    <bean class="sferencik.teamcity.sincity.BuildFinishedListener" />
+    <bean class="sferencik.teamcity.sincity.BuildStatusListener" />
 </beans>
