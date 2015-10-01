@@ -21,6 +21,7 @@ public class BuildStatusListener
             public void buildStarted(@NotNull SRunningBuild build)
             {
                 Loggers.SERVER.debug("[SinCity] build starting: " + build);
+                super.buildStarted(build);
 
                 SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
                 if (sinCityFeature == null)
@@ -38,6 +39,7 @@ public class BuildStatusListener
             public void buildFinished(@NotNull SRunningBuild build)
             {
                 Loggers.SERVER.debug("[SinCity] build finishing: " + build);
+                super.buildFinished(build);
 
                 SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
                 if (sinCityFeature == null)

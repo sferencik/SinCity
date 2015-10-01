@@ -36,6 +36,7 @@ public class BuildStartedListener {
             @Override
             public void sourcesUpdated(@NotNull AgentRunningBuild build) {
                 Loggers.AGENT.debug("[SinCity] sourcesUpdated(" + build + ") triggered");
+                super.sourcesUpdated(build);
                 new ParamsToFiles(build).storeIfSet();
             }
 
@@ -47,6 +48,7 @@ public class BuildStartedListener {
             @Override
             public void beforeRunnerStart(@NotNull BuildRunnerContext runner) {
                 Loggers.AGENT.debug("[SinCity] beforeRunnerStart(" + runner.getBuild() + ", " + runner.getName() + ") triggered");
+                super.beforeRunnerStart(runner);
                 new ParamsToFiles(runner.getBuild()).storeIfSet();
             }
         });
