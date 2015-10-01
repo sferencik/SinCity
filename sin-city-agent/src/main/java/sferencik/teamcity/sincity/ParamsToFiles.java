@@ -27,34 +27,40 @@ public class ParamsToFiles {
         } catch (IOException e) {
             Loggers.AGENT.error("[SinCity] writing failed, " + e);
         }
+    }
 
+    private void writeParameterToFileIfSet(String parameterName, String filePath) {
+        final Map<String, String> configParameters = build.getSharedConfigParameters();
+        if (!configParameters.containsKey(parameterName)) {
+            Loggers.AGENT.debug("[SinCity] the " + parameterName + " parameter is not set");
+            return;
+        }
+
+        String parameterValue = configParameters.get(parameterName);
+
+        if (parameterValue == null || parameterValue.isEmpty()) {
+            Loggers.AGENT.debug("[SinCity] the " + parameterName + " is empty");
+            return;
+        }
+
+        writeStringToFile(parameterValue, filePath);
     }
 
     void storeIfSet() {
         final ParameterNames parameterNames = new ParameterNames();
-        final Map<String, String> configParameters = build.getSharedConfigParameters();
-
-        if (!configParameters.containsKey(parameterNames.getSincityBuildProblems())
-                && !configParameters.containsKey(parameterNames.getSincityTestFailures())) {
-            Loggers.AGENT.debug("[SinCity] the JSON parameters are not set");
-            return;
-        }
-
         String buildTempDirectory = build.getBuildTempDirectory().getAbsolutePath();
         final FileNames fileNames = new FileNames();
 
-        if (configParameters.containsKey(parameterNames.getSincityBuildProblems())) {
-            Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityBuildProblems());
-            writeStringToFile(
-                    configParameters.get(parameterNames.getSincityBuildProblems()),
-                    String.valueOf(new File(new File(buildTempDirectory), fileNames.getProblemDataJsonFilename())));
-        }
 
-        if (configParameters.containsKey(parameterNames.getSincityTestFailures())) {
-            Loggers.AGENT.debug("[SinCity] storing " + parameterNames.getSincityTestFailures());
-            writeStringToFile(
-                    configParameters.get(parameterNames.getSincityTestFailures()),
-                    String.valueOf(new File(new File(buildTempDirectory), fileNames.getTestFailureJsonFilename())));
-        }
+        File buildProblemJsonFile = new File(new File(buildTempDirectory), fileNames.getProblemDataJsonFilename());
+        File testFailureJsonFile = new File(new File(buildTempDirectory), fileNames.getTestFailureJsonFilename());
+
+        Loggers.AGENT.debug("[SinCity] " + buildProblemJsonFile + " " + (buildProblemJsonFile.exists() ? "exists" : "does not exist"));
+        Loggers.AGENT.debug("[SinCity] " + testFailureJsonFile + " " + (testFailureJsonFile.exists() ? "exists" : "does not exist"));
+
+        writeParameterToFileIfSet(parameterNames.getSincityBuildProblems(),
+                buildProblemJsonFile.toString());
+        writeParameterToFileIfSet(parameterNames.getSincityTestFailures(),
+                testFailureJsonFile.toString());
     }
 }
