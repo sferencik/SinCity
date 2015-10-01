@@ -133,10 +133,14 @@ public class CulpritFinder {
         suspectChanges.remove(0);
         Collections.reverse(suspectChanges);
 
-        BuildCustomizer buildCustomizer = getBuildCustomizer();
+        BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(newBuild.getBuildType(), null);
 
         for (SVcsModification change : suspectChanges) {
             Loggers.SERVER.info("[SinCity] Queueing change '" + change + "' having failed build " + newBuild);
+
+            Map<String, String> buildParameters = getCommonBuildParameters();
+            buildParameters.put(new ParameterNames().getSincitySuspectChange(), change.getVersion());
+            buildCustomizer.setParameters(buildParameters);
 
             buildCustomizer.setChangesUpTo(change);
 
@@ -146,9 +150,7 @@ public class CulpritFinder {
     }
 
     @NotNull
-    private BuildCustomizer getBuildCustomizer() {
-        BuildCustomizer buildCustomizer = buildCustomizerFactory.createBuildCustomizer(newBuild.getBuildType(), null);
-
+    private Map<String, String> getCommonBuildParameters() {
         Map<String, String> parameters = new HashMap<String, String>();
         final ParameterNames parameterNames = new ParameterNames();
         parameters.put(parameterNames.getSincityRangeTopBuildId(), String.valueOf(newBuild.getBuildId()));
@@ -163,9 +165,7 @@ public class CulpritFinder {
             parameters.put(parameterNames.getSincityBuildProblems(), Encoder.encodeBuildProblems(getRelevantBuildProblems()));
         if (isSetTestFailureJsonParameter())
             parameters.put(parameterNames.getSincityTestFailures(), Encoder.encodeTestNames(getRelevantTestFailures()));
-        buildCustomizer.setParameters(parameters);
-
-        return buildCustomizer;
+        return parameters;
     }
 
     private boolean isSetBuildProblemJsonParameter() {

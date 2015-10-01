@@ -24,4 +24,8 @@ public class ParameterNames {
     public String getSincityTestFailures() {
         return "sincity.test.failures.json";
     }
+
+    public String getSincitySuspectChange() {
+        return "sincity.suspect.change";
+    }
 }
