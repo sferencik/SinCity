@@ -54,7 +54,7 @@
                         <span class="smallNote">If checked, the culprit-finding builds will receive a list of build
                         problems as a JSON structure. This has the form of a build parameter
                         (<code>${parameterName.sincityBuildProblems}</code>) and a JSON file (<code>&lt;build temp
-                        dir&gt;/${fileName.problemDataJsonFilename}</code>).</span>
+                        dir&gt;/${fileName.buildProblemJsonFilename}</code>).</span>
                     </td>
                     <td>
                         <props:checkboxProperty name="${settingName.cbSetTestFailureJsonParameter}" /> send as JSON<br/>

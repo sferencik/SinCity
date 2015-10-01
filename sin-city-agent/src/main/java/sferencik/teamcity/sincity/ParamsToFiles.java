@@ -52,7 +52,7 @@ public class ParamsToFiles {
         final FileNames fileNames = new FileNames();
 
 
-        File buildProblemJsonFile = new File(new File(buildTempDirectory), fileNames.getProblemDataJsonFilename());
+        File buildProblemJsonFile = new File(new File(buildTempDirectory), fileNames.getBuildProblemJsonFilename());
         File testFailureJsonFile = new File(new File(buildTempDirectory), fileNames.getTestFailureJsonFilename());
 
         Loggers.AGENT.debug("[SinCity] " + buildProblemJsonFile + " " + (buildProblemJsonFile.exists() ? "exists" : "does not exist"));

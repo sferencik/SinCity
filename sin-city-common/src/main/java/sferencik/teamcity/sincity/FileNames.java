@@ -3,7 +3,7 @@ package sferencik.teamcity.sincity;
 public class FileNames {
     ParameterNames parameterNames = new ParameterNames();
 
-    public String getProblemDataJsonFilename() {
+    public String getBuildProblemJsonFilename() {
         return parameterNames.getSincityBuildProblems();
     }
 
