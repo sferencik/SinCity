@@ -1,6 +1,6 @@
 package sferencik.teamcity.sincity.json;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jetbrains.buildServer.BuildProblemData;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public abstract class Encoder {
         for (jetbrains.buildServer.tests.TestName tn : testNames) {
             serialisableTestNames.add(new TestName(tn));
         }
-        return new Gson().toJson(serialisableTestNames);
+        return new GsonBuilder().disableHtmlEscaping().create().toJson(serialisableTestNames);
     }
 
     public static String encodeBuildProblems(List<BuildProblemData> buildProblems) {
@@ -20,6 +20,6 @@ public abstract class Encoder {
         for (BuildProblemData bp : buildProblems) {
             serialisableBuildProblems.add(new BuildProblem(bp));
         }
-        return new Gson().toJson(serialisableBuildProblems);
+        return new GsonBuilder().disableHtmlEscaping().create().toJson(serialisableBuildProblems);
     }
 }
