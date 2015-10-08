@@ -28,7 +28,7 @@ public class SinCityBuildFeature extends BuildFeature {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Culprit finder";
+        return "Culprit finder (SinCity)";
     }
 
     @Nullable
@@ -41,8 +41,11 @@ public class SinCityBuildFeature extends BuildFeature {
     @Override
     public String describeParameters(@NotNull Map<String, String> params)
     {
-        return "Find the culprit of a broken build";
-
+        return "Find the culprit of a broken build " +
+                "(" +
+                params.get(new SettingNames().getRbTriggerOnBuildProblem()).toLowerCase() + " build problems, " +
+                params.get(new SettingNames().getRbTriggerOnTestFailure()).toLowerCase() + " test failures" +
+                ")";
     }
 
     @Nullable
@@ -64,7 +67,10 @@ public class SinCityBuildFeature extends BuildFeature {
     @Override
     public Map<String, String> getDefaultParameters()
     {
-        return new HashMap<String, String>();
+        HashMap<String, String> defaultParameters = new HashMap<String, String>();
+        defaultParameters.put(new SettingNames().getRbTriggerOnBuildProblem(), "New");
+        defaultParameters.put(new SettingNames().getRbTriggerOnTestFailure(), "New");
+        return defaultParameters;
     }
 
     @Override
