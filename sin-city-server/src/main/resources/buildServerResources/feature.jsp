@@ -2,6 +2,7 @@
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 
 <jsp:useBean id="settingName" class="sferencik.teamcity.sincity.SettingNames"/>
+<jsp:useBean id="settingValue" class="sferencik.teamcity.sincity.SettingValues"/>
 <jsp:useBean id="parameterName" class="sferencik.teamcity.sincity.ParameterNames"/>
 <jsp:useBean id="fileName" class="sferencik.teamcity.sincity.FileNames"/>
 
@@ -25,15 +26,15 @@
                 </tr>
                 <tr>
                     <td>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="No" /> no<br/>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="New" /> new (default)<br/>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="All" /> all
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="${settingValue.noTrigger}" /> no<br/>
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="${settingValue.triggerOnNew}" /> new (default)<br/>
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnBuildProblem}" value="${settingValue.triggerOnAll}" /> all
                         <span class="smallNote">Should culprit-finding builds be kicked on build problems (e.g. non-zero exit code)?</span>
                     </td>
                     <td>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="No" /> no<br/>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="New" /> new (default)<br/>
-                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="All" /> all
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="${settingValue.noTrigger}" /> no<br/>
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="${settingValue.triggerOnNew}" /> new (default)<br/>
+                        <props:radioButtonProperty name="${settingName.rbTriggerOnTestFailure}" value="${settingValue.triggerOnAll}" /> all
                         <span class="smallNote">Should culprit-finding builds be kicked on test failures?</span>
                     </td>
                 </tr>
