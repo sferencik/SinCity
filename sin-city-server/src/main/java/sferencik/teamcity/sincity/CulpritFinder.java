@@ -60,11 +60,11 @@ public class CulpritFinder {
 
     private List<BuildProblemData> getRelevantBuildProblems()
     {
-        SettingValues settingValues = new SettingValues();
+        SettingNames settingNames = new SettingNames();
 
         final String rbTriggerOnBuildProblem = sinCityParameters.get(new SettingNames().getRbTriggerOnBuildProblem());
 
-        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingValues.getNoTrigger())) {
+        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] build problems do not trigger");
             return new ArrayList<BuildProblemData>();
         }
@@ -72,7 +72,7 @@ public class CulpritFinder {
         final List<BuildProblemData> thisBuildProblems = newBuild.getFailureReasons();
         Loggers.SERVER.debug("[SinCity] this build's problems: " + thisBuildProblems);
 
-        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingValues.getTriggerOnAll())) {
+        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingNames.getTriggerOnAll())) {
             Loggers.SERVER.debug("[SinCity] reporting all build problems");
             return thisBuildProblems;
         }
@@ -92,11 +92,11 @@ public class CulpritFinder {
 
     private List<TestName> getRelevantTestFailures()
     {
-        SettingValues settingValues = new SettingValues();
+        SettingNames settingNames = new SettingNames();
 
         String rbTriggerOnTestFailure = sinCityParameters.get(new SettingNames().getRbTriggerOnTestFailure());
 
-        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingValues.getNoTrigger())) {
+        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] test failures do not trigger");
             return new ArrayList<TestName>();
         }
@@ -104,7 +104,7 @@ public class CulpritFinder {
         final List<TestName> thisBuildTestFailures = getTestNames(newBuild.getTestMessages(0, -1));
         Loggers.SERVER.debug("[SinCity] this build's test failures: " + thisBuildTestFailures);
 
-        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingValues.getTriggerOnAll())) {
+        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingNames.getTriggerOnAll())) {
             Loggers.SERVER.debug("[SinCity] reporting all test failures");
             return thisBuildTestFailures;
         }
