@@ -1,7 +1,9 @@
 package sferencik.teamcity.sincity.json;
 
+import jetbrains.buildServer.util.StringUtil;
+
 public class Util {
     static String nullifyEmptyString(String s) {
-        return s == null || s.equals("") ? null : s;
+        return StringUtil.isEmpty(s) ? null : s;
     }
 }

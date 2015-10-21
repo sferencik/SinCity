@@ -2,6 +2,7 @@ package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +31,12 @@ public class BuildTagger {
         // user has set the parameter up in their build configuration; therefore, don't just test for null and accept
         // empty as a sign of a non-SinCity-triggered build
         final String sincityRangeTopBuildId = build.getParametersProvider().get(new ParameterNames().getSincityRangeTopBuildId());
-        String tagParameterName = sincityRangeTopBuildId == null || sincityRangeTopBuildId.isEmpty()
+        String tagParameterName = StringUtil.isEmpty(sincityRangeTopBuildId)
                 ? settingNames.getTagNameForBuildsNotTriggeredBySinCity()
                 : settingNames.getTagNameForBuildsTriggeredBySinCity();
         final String tagName = sinCityParameters.get(tagParameterName);
 
-        if (tagName == null || tagName.isEmpty())
+        if (StringUtil.isEmpty(tagName))
             return;
 
         Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");

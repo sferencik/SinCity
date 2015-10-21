@@ -2,6 +2,7 @@ package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.log.Loggers;
+import jetbrains.buildServer.util.StringUtil;
 
 import java.io.*;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class ParamsToFiles {
 
         String parameterValue = configParameters.get(parameterName);
 
-        if (parameterValue == null || parameterValue.isEmpty()) {
+        if (StringUtil.isEmpty(parameterValue)) {
             Loggers.AGENT.debug("[SinCity] the " + parameterName + " is empty");
             return;
         }
