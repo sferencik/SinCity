@@ -5,6 +5,8 @@ import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 public class BuildStatusListener
 {
     public BuildStatusListener(@NotNull final EventDispatcher<BuildServerListener> listener,
@@ -45,7 +47,25 @@ public class BuildStatusListener
                 if (sinCityFeature == null)
                     return;
 
-                new CulpritFinder(build, buildCustomizerFactory, sinCityFeature.getParameters()).triggerCulpritFindingIfNeeded();
+                Map<String, String> parameters = sinCityFeature.getParameters();
+                SettingNames settingNames = new SettingNames();
+                String triggerOnNew = settingNames.getTriggerOnNew();
+
+                String rbTriggerOnBuildProblems = parameters.get(settingNames.getRbTriggerOnBuildProblem());
+                String rbTriggerOnTestFailures = parameters.get(settingNames.getRbTriggerOnTestFailure());
+                String cbSetBuildProblemJsonParameterString = parameters.get(settingNames.getCbSetBuildProblemJsonParameter());
+                String cbSetTestFailureJsonParameterString = parameters.get(settingNames.getCbSetTestFailureJsonParameter());
+
+                new CulpritFinder(
+                        build,
+                        build.getPreviousFinished(),
+                        rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
+                        rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
+                        cbSetBuildProblemJsonParameterString != null && Boolean.valueOf(cbSetBuildProblemJsonParameterString),
+                        cbSetTestFailureJsonParameterString != null && Boolean.valueOf(cbSetTestFailureJsonParameterString),
+                        buildCustomizerFactory
+                )
+                    .triggerCulpritFindingIfNeeded();
             }
 
             /*

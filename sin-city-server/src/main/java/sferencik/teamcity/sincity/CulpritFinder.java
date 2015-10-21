@@ -2,35 +2,59 @@ package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.BuildCustomizer;
-import jetbrains.buildServer.serverSide.BuildCustomizerFactory;
-import jetbrains.buildServer.serverSide.SFinishedBuild;
-import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.tests.TestInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.vcs.SVcsModification;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sferencik.teamcity.sincity.json.Encoder;
 
 import java.util.*;
 
 public class CulpritFinder {
 
-    private final SRunningBuild newBuild;
-    private final SFinishedBuild oldBuild;
-    private final BuildCustomizerFactory buildCustomizerFactory;
-    private final Map<String, String> sinCityParameters;
+    @NotNull private final SRunningBuild newBuild;
+    @Nullable private final SFinishedBuild oldBuild;
+    @NotNull private final String triggerOnBuildProblem;
+    @NotNull private final String triggerOnTestFailure;
+    private final boolean setBuildProblemJsonParameter;
+    private final boolean setTestFailureJsonParameter;
+    @NotNull private final BuildCustomizerFactory buildCustomizerFactory;
 
-    public CulpritFinder(SRunningBuild build,
-                         BuildCustomizerFactory buildCustomizerFactory,
-                         Map<String, String> sinCityParameters) {
+    /**
+     * Run culprit finding between oldBuild and newBuild.
+     * @param newBuild the top of the culprit-finding range. This is the finishing (and failing) build that triggered
+     *                 the culprit-finding.
+     * @param oldBuild the bottom of the culprit-finding range. Can be null if newBuild is the only build so far in the
+     *                 build configuration.
+     * @param triggerOnBuildProblem
+     * @param triggerOnTestFailure
+     * @param setBuildProblemJsonParameter
+     * @param setTestFailureJsonParameter
+     * @param buildCustomizerFactory
+     */
+    public CulpritFinder(@NotNull SRunningBuild newBuild,
+                         @Nullable SFinishedBuild oldBuild,
+                         @NotNull String triggerOnBuildProblem,
+                         @NotNull String triggerOnTestFailure,
+                         boolean setBuildProblemJsonParameter,
+                         boolean setTestFailureJsonParameter,
+                         @NotNull BuildCustomizerFactory buildCustomizerFactory) {
 
-        this.newBuild = build;
+        this.newBuild = newBuild;
+        this.oldBuild = oldBuild;
         this.buildCustomizerFactory = buildCustomizerFactory;
-        this.sinCityParameters = sinCityParameters;
+        this.triggerOnBuildProblem = triggerOnBuildProblem;
+        this.triggerOnTestFailure = triggerOnTestFailure;
+        this.setBuildProblemJsonParameter = setBuildProblemJsonParameter;
+        this.setTestFailureJsonParameter = setTestFailureJsonParameter;
 
-        this.oldBuild = newBuild.getPreviousFinished();
-        Loggers.SERVER.debug("[SinCity] previous build: " + oldBuild);
+        Loggers.SERVER.debug("[SinCity] culprit finding " +
+                (oldBuild == null
+                        ? "for"
+                        : "between [" + oldBuild + "] and") +
+                " [" + newBuild + "]");
     }
 
     /**
@@ -62,9 +86,8 @@ public class CulpritFinder {
     {
         SettingNames settingNames = new SettingNames();
 
-        final String rbTriggerOnBuildProblem = sinCityParameters.get(new SettingNames().getRbTriggerOnBuildProblem());
 
-        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingNames.getNoTrigger())) {
+        if (triggerOnBuildProblem.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] build problems do not trigger");
             return new ArrayList<BuildProblemData>();
         }
@@ -72,7 +95,7 @@ public class CulpritFinder {
         final List<BuildProblemData> thisBuildProblems = newBuild.getFailureReasons();
         Loggers.SERVER.debug("[SinCity] this build's problems: " + thisBuildProblems);
 
-        if (rbTriggerOnBuildProblem != null && rbTriggerOnBuildProblem.equals(settingNames.getTriggerOnAll())) {
+        if (triggerOnBuildProblem.equals(settingNames.getTriggerOnAll())) {
             Loggers.SERVER.debug("[SinCity] reporting all build problems");
             return thisBuildProblems;
         }
@@ -94,9 +117,8 @@ public class CulpritFinder {
     {
         SettingNames settingNames = new SettingNames();
 
-        String rbTriggerOnTestFailure = sinCityParameters.get(new SettingNames().getRbTriggerOnTestFailure());
 
-        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingNames.getNoTrigger())) {
+        if (triggerOnTestFailure.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] test failures do not trigger");
             return new ArrayList<TestName>();
         }
@@ -104,7 +126,7 @@ public class CulpritFinder {
         final List<TestName> thisBuildTestFailures = getTestNames(newBuild.getTestMessages(0, -1));
         Loggers.SERVER.debug("[SinCity] this build's test failures: " + thisBuildTestFailures);
 
-        if (rbTriggerOnTestFailure != null && rbTriggerOnTestFailure.equals(settingNames.getTriggerOnAll())) {
+        if (triggerOnTestFailure.equals(settingNames.getTriggerOnAll())) {
             Loggers.SERVER.debug("[SinCity] reporting all test failures");
             return thisBuildTestFailures;
         }
@@ -165,20 +187,11 @@ public class CulpritFinder {
         parameters.put(parameterNames.getSincityRangeBottomBuildNumber(), oldBuild == null
                 ? "n/a"
                 : oldBuild.getBuildNumber());
-        if (isSetBuildProblemJsonParameter())
+        if (setBuildProblemJsonParameter)
             parameters.put(parameterNames.getSincityBuildProblems(), Encoder.encodeBuildProblems(getRelevantBuildProblems()));
-        if (isSetTestFailureJsonParameter())
+        if (setTestFailureJsonParameter)
             parameters.put(parameterNames.getSincityTestFailures(), Encoder.encodeTestNames(getRelevantTestFailures()));
         return parameters;
     }
 
-    private boolean isSetBuildProblemJsonParameter() {
-        final String setBuildProblemJsonParameterAsString = sinCityParameters.get(new SettingNames().getCbSetBuildProblemJsonParameter());
-        return setBuildProblemJsonParameterAsString != null && Boolean.valueOf(setBuildProblemJsonParameterAsString);
-    }
-
-    private boolean isSetTestFailureJsonParameter() {
-        final String setTestFailureJsonParameterAsString = sinCityParameters.get(new SettingNames().getCbSetTestFailureJsonParameter());
-        return setTestFailureJsonParameterAsString != null && Boolean.valueOf(setTestFailureJsonParameterAsString);
-    }
 }
