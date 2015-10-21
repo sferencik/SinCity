@@ -25,7 +25,11 @@ public class BuildStatusListener
                 Loggers.SERVER.debug("[SinCity] build starting: " + build);
                 super.buildStarted(build);
 
-                SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
+                final SBuildType buildType = build.getBuildType();
+                if (buildType == null)
+                    return;
+
+                SBuildFeatureDescriptor sinCityFeature = SinCityUtils.getSinCityFeature(buildType);
                 if (sinCityFeature == null)
                     return;
 
@@ -43,7 +47,11 @@ public class BuildStatusListener
                 Loggers.SERVER.debug("[SinCity] build finishing: " + build);
                 super.buildFinished(build);
 
-                SBuildFeatureDescriptor sinCityFeature = getSinCityFeature(build);
+                final SBuildType buildType = build.getBuildType();
+                if (buildType == null)
+                    return;
+
+                SBuildFeatureDescriptor sinCityFeature = SinCityUtils.getSinCityFeature(buildType);
                 if (sinCityFeature == null)
                     return;
 
@@ -66,29 +74,6 @@ public class BuildStatusListener
                         buildCustomizerFactory
                 )
                     .triggerCulpritFindingIfNeeded();
-            }
-
-            /*
-            For a given running build, look through its build type's build features and return a feature descriptor for
-            the SinCity feature if it's enabled. We only allow a single SinCity feature (see
-            SinCityBuildFeature.isMultipleFeaturesPerBuildTypeAllowed()) so this either returns an instance or null.
-             */
-            private SBuildFeatureDescriptor getSinCityFeature(SRunningBuild build) {
-                final SBuildType buildType = build.getBuildType();
-                if (buildType == null)
-                    return null;
-
-                for (SBuildFeatureDescriptor feature : buildType.getBuildFeatures()) {
-                    final Class<? extends BuildFeature> featureClass = feature.getBuildFeature().getClass();
-                    Loggers.SERVER.debug("[SinCity] found plugin: " + featureClass);
-                    if (!featureClass.equals(SinCityBuildFeature.class))
-                        continue;
-
-                    Loggers.SERVER.debug("[SinCity] the SinCity plugin is enabled");
-                    return feature;
-                }
-
-                return null;
             }
         });
     }
