@@ -7,6 +7,7 @@ import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.openapi.buildType.BuildTypeTab;
 import org.jetbrains.annotations.NotNull;
+import sferencik.teamcity.sincity.FinishedBuildWithChange;
 import sferencik.teamcity.sincity.SinCityUtils;
 
 import javax.servlet.http.HttpServletRequest;

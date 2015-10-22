@@ -68,7 +68,13 @@ public class CulpritFinder {
             return;
         }
 
-        List<SVcsModification> changesBetweenBuilds = getChangesBetween(oldBuild, newBuild);
+        List<SVcsModification> changesBetweenBuilds = null;
+        try {
+            changesBetweenBuilds = getChangesBetween(oldBuild, newBuild);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
         if (changesBetweenBuilds.size() <= 1) {
             Loggers.SERVER.debug("[SinCity] no intermediate changes found; we're done.");
@@ -201,15 +207,25 @@ public class CulpritFinder {
     // algorithm used
     private List<SVcsModification> getChangesBetween(
             @Nullable SFinishedBuild oldBuild,
-            @NotNull SBuild newBuild)
-    {
+            @NotNull SBuild newBuild) throws Exception {
         // use a linked set to avoid duplicates and to keep the changes in descending order
         Set<SVcsModification> changeList = new LinkedHashSet<SVcsModification>();
         BuildPromotion buildPromotion = newBuild.getBuildPromotion();
 
+        // find oldBuildchange, the changelist of oldBuild; in the while loop below, reaching oldBuildChange will be our
+        // terminating condition
+        // NB: oldBuildChange will be null if oldBuild was executed before any VCS was attached to the build
+        // configuration; otherwise oldBuild really should have a change associated with it
+        SVcsModification oldBuildChange = null;
+        if (oldBuild != null) {
+            FinishedBuildWithChange oldBuildWithChange = FinishedBuildWithChange.fromSFinishedBuild(oldBuild);
+            if (oldBuildWithChange != null)
+                oldBuildChange = oldBuildWithChange.getChange();
+        }
+
         while (true) {
-            if (oldBuild == null) {
-                // we are supposed to search till the end of history
+            if (oldBuildChange == null) {
+                // we are supposed to search all the way to Big Bang
                 if (buildPromotion == null) {
                     // we have reached Big Bang
                     return new ArrayList<SVcsModification>(changeList);
@@ -219,17 +235,18 @@ public class CulpritFinder {
                 }
             }
             else {
-                // we should only go as far as oldBuild
+                // we should only go as far as oldBuildChange
                 if (buildPromotion == null) {
-                    // we have reached Big Bang and never found oldBuild; return empty
-                    return new ArrayList<SVcsModification>();
+                    // we have reached Big Bang and never found oldBuildChange
+                    throw new Exception("Could not find changes between " + oldBuild + " and " + newBuild);
                 }
-                else if (buildPromotion == oldBuild.getBuildPromotion()) {
-                    // we have reached oldBuild
+                else if (buildPromotion.getContainingChanges().contains(oldBuildChange)) {
+                    // we have reached oldBuildChange
+                    buildPromotion.getContainingChanges().subList(0, buildPromotion.getContainingChanges().indexOf(oldBuildChange));
                     return new ArrayList<SVcsModification>(changeList);
                 }
                 else {
-                    // keep going; we haven't seen oldBuild yet
+                    // keep going; we haven't seen oldBuildChange yet
                 }
             }
 

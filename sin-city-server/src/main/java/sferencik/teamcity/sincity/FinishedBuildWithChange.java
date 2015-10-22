@@ -1,4 +1,4 @@
-package sferencik.teamcity.sincity.manualTrigger;
+package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.serverSide.BuildPromotion;
 import jetbrains.buildServer.serverSide.SBuildType;
@@ -33,15 +33,15 @@ public class FinishedBuildWithChange {
         return change;
     }
 
-    private final SFinishedBuild build;
-    private final SVcsModification change;
+    @NotNull private final SFinishedBuild build;
+    @NotNull private final SVcsModification change;
 
-    private FinishedBuildWithChange(SFinishedBuild build, SVcsModification change) {
+    private FinishedBuildWithChange(@NotNull SFinishedBuild build, @NotNull SVcsModification change) {
         this.build = build;
         this.change = change;
     }
 
-    private static FinishedBuildWithChange fromSFinishedBuild(@NotNull SFinishedBuild build) {
+    static FinishedBuildWithChange fromSFinishedBuild(@NotNull SFinishedBuild build) {
         BuildPromotion buildPromotion = build.getBuildPromotion();
         while (buildPromotion != null && buildPromotion.getContainingChanges().isEmpty())
             buildPromotion = buildPromotion.getPreviousBuildPromotion(SelectPrevBuildPolicy.SINCE_LAST_BUILD);
@@ -61,7 +61,7 @@ public class FinishedBuildWithChange {
      * @return the list of FinishedBuildWithChange objects
      */
     @NotNull
-    static List<FinishedBuildWithChange> getListFromBuildType(@NotNull SBuildType sBuildType) {
+    public static List<FinishedBuildWithChange> getListFromBuildType(@NotNull SBuildType sBuildType) {
         List<FinishedBuildWithChange> buildsWithChange = new ArrayList<FinishedBuildWithChange>();
         for (SFinishedBuild build : sBuildType.getHistory(null, false, true)) {
             FinishedBuildWithChange buildWithChange = fromSFinishedBuild(build);
