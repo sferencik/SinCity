@@ -6,6 +6,7 @@ import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.tests.TestInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import sferencik.teamcity.sincity.json.Encoder;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class CulpritFinder {
 
-    @NotNull private final SRunningBuild newBuild;
+    @NotNull private final SBuild newBuild;
     @Nullable private final SFinishedBuild oldBuild;
     @NotNull private final String triggerOnBuildProblem;
     @NotNull private final String triggerOnTestFailure;
@@ -24,8 +25,8 @@ public class CulpritFinder {
 
     /**
      * Run culprit finding between oldBuild and newBuild.
-     * @param newBuild the top of the culprit-finding range. This is the finishing (and failing) build that triggered
-     *                 the culprit-finding.
+     * @param newBuild the top of the culprit-finding range. Can be an SFinishedBuild (for manually triggered builds) or
+     *                 an SRunningBuild (the finishing build for automatically triggered builds).
      * @param oldBuild the bottom of the culprit-finding range. Can be null if newBuild is the only build so far in the
      *                 build configuration.
      * @param triggerOnBuildProblem
@@ -34,7 +35,7 @@ public class CulpritFinder {
      * @param setTestFailureJsonParameter
      * @param buildCustomizerFactory
      */
-    public CulpritFinder(@NotNull SRunningBuild newBuild,
+    public CulpritFinder(@NotNull SBuild newBuild,
                          @Nullable SFinishedBuild oldBuild,
                          @NotNull String triggerOnBuildProblem,
                          @NotNull String triggerOnTestFailure,
@@ -61,13 +62,15 @@ public class CulpritFinder {
      * Investigate if culprit finding is needed. This is so if there are relevant failures and the finishing build has
      * covered  multiple changes.
      */
-    void triggerCulpritFindingIfNeeded() {
+    public void triggerCulpritFindingIfNeeded() {
         if (newBuild.getBuildStatus().isSuccessful()) {
             Loggers.SERVER.debug("[SinCity] the build succeeded; we're done.");
             return;
         }
 
-        if (newBuild.getContainingChanges().size() <= 1) {
+        List<SVcsModification> changesBetweenBuilds = getChangesBetween(oldBuild, newBuild);
+
+        if (changesBetweenBuilds.size() <= 1) {
             Loggers.SERVER.debug("[SinCity] no intermediate changes found; we're done.");
             return;
         }
@@ -79,7 +82,7 @@ public class CulpritFinder {
         }
 
         Loggers.SERVER.info("[SinCity] will look for culprit");
-        triggerCulpritFinding();
+        triggerCulpritFinding(changesBetweenBuilds);
     }
 
     private List<BuildProblemData> getRelevantBuildProblems()
@@ -153,9 +156,9 @@ public class CulpritFinder {
         return testNames;
     }
 
-    private void triggerCulpritFinding()
+    private void triggerCulpritFinding(List<SVcsModification> changesBetweenBuilds)
     {
-        List<SVcsModification> suspectChanges = new ArrayList<SVcsModification>(newBuild.getContainingChanges());
+        List<SVcsModification> suspectChanges = new ArrayList<SVcsModification>(changesBetweenBuilds);
         suspectChanges.remove(0);
         Collections.reverse(suspectChanges);
 
@@ -194,4 +197,46 @@ public class CulpritFinder {
         return parameters;
     }
 
+    // see https://devnet.jetbrains.com/message/5561038 for the explanation of why we need this method, and the
+    // algorithm used
+    private List<SVcsModification> getChangesBetween(
+            @Nullable SFinishedBuild oldBuild,
+            @NotNull SBuild newBuild)
+    {
+        // use a linked set to avoid duplicates and to keep the changes in descending order
+        Set<SVcsModification> changeList = new LinkedHashSet<SVcsModification>();
+        BuildPromotion buildPromotion = newBuild.getBuildPromotion();
+
+        while (true) {
+            if (oldBuild == null) {
+                // we are supposed to search till the end of history
+                if (buildPromotion == null) {
+                    // we have reached Big Bang
+                    return new ArrayList<SVcsModification>(changeList);
+                }
+                else {
+                    // keep going; we haven't reached Big Bang yet
+                }
+            }
+            else {
+                // we should only go as far as oldBuild
+                if (buildPromotion == null) {
+                    // we have reached Big Bang and never found oldBuild; return empty
+                    return new ArrayList<SVcsModification>();
+                }
+                else if (buildPromotion == oldBuild.getBuildPromotion()) {
+                    // we have reached oldBuild
+                    return new ArrayList<SVcsModification>(changeList);
+                }
+                else {
+                    // keep going; we haven't seen oldBuild yet
+                }
+            }
+
+            Loggers.SERVER.debug("[SinCity] build promotion " + buildPromotion);
+            Loggers.SERVER.debug("[SinCity] changes " + buildPromotion.getContainingChanges());
+            changeList.addAll(buildPromotion.getContainingChanges());
+            buildPromotion = buildPromotion.getPreviousBuildPromotion(SelectPrevBuildPolicy.SINCE_LAST_BUILD);
+        }
+    }
 }

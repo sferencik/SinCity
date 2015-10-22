@@ -4,4 +4,9 @@
     <bean class="sferencik.teamcity.sincity.SinCityBuildFeature" />
     <bean class="sferencik.teamcity.sincity.SettingsPageController" />
     <bean class="sferencik.teamcity.sincity.BuildStatusListener" />
+
+    <bean class="sferencik.teamcity.sincity.manualTrigger.ManualTriggerController "/>
+    <bean class="sferencik.teamcity.sincity.manualTrigger.ManualTriggerTab">
+        <property name="includeUrl" value="triggerCulpritFinding.jsp"/>
+    </bean>
 </beans>

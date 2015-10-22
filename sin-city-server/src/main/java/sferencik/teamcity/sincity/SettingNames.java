@@ -36,4 +36,12 @@ public class SettingNames {
     public String getCbSetTestFailureJsonParameter() {
         return "sincity.cbSetTestFailureJsonParameter";
     }
+
+    public String getRbRangeBottom() {
+        return "sincity.rbRangeBottom";
+    }
+
+    public String getRbRangeTop() {
+        return "sincity.rbRangeTop";
+    }
 }
