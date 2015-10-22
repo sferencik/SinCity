@@ -240,7 +240,7 @@ public class CulpritFinder {
                 }
                 else if (buildPromotion.getContainingChanges().contains(oldBuildChange)) {
                     // we have reached oldBuildChange
-                    buildPromotion.getContainingChanges().subList(0, buildPromotion.getContainingChanges().indexOf(oldBuildChange));
+                    changeList.addAll(buildPromotion.getContainingChanges().subList(0, buildPromotion.getContainingChanges().indexOf(oldBuildChange)));
                     return new ArrayList<SVcsModification>(changeList);
                 }
                 else {
