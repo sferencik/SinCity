@@ -70,7 +70,7 @@ public class CulpritFinder {
 
         List<SVcsModification> changesBetweenBuilds = null;
         try {
-            changesBetweenBuilds = getChangesBetween(oldBuild, newBuild);
+            changesBetweenBuilds = getChanges();
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -205,9 +205,7 @@ public class CulpritFinder {
 
     // see https://devnet.jetbrains.com/message/5561038 for the explanation of why we need this method, and the
     // algorithm used
-    private List<SVcsModification> getChangesBetween(
-            @Nullable SFinishedBuild oldBuild,
-            @NotNull SBuild newBuild) throws Exception {
+    private List<SVcsModification> getChanges() throws Exception {
         // use a linked set to avoid duplicates and to keep the changes in descending order
         Set<SVcsModification> changeList = new LinkedHashSet<SVcsModification>();
         BuildPromotion buildPromotion = newBuild.getBuildPromotion();
