@@ -50,14 +50,14 @@
                 </tr>
                 <tr>
                     <td>
-                        <props:checkboxProperty name="${settingName.cbSetBuildProblemJsonParameter}" /> send as JSON<br/>
+                        <props:checkboxProperty name="${settingName.cbSetBuildProblemJsonParameter}" value="${settingName.checkboxValue}" /> send as JSON<br/>
                         <span class="smallNote">If checked, the culprit-finding builds will receive a list of build
                         problems as a JSON structure. This has the form of a build parameter
                         (<code>${parameterName.sincityBuildProblems}</code>) and a JSON file (<code>&lt;build temp
                         dir&gt;/${fileName.buildProblemJsonFilename}</code>).</span>
                     </td>
                     <td>
-                        <props:checkboxProperty name="${settingName.cbSetTestFailureJsonParameter}" /> send as JSON<br/>
+                        <props:checkboxProperty name="${settingName.cbSetTestFailureJsonParameter}" value="${settingName.checkboxValue}" /> send as JSON<br/>
                         <span class="smallNote">If checked, the culprit-finding builds will receive a list of test
                         failures as a JSON structure. This has the form of a build parameter
                         (<code>${parameterName.sincityTestFailures}</code>) and a JSON file (<code>&lt;build temp

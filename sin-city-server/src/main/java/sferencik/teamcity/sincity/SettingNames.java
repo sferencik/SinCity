@@ -44,4 +44,8 @@ public class SettingNames {
     public String getRbRangeTop() {
         return "sincity.rbRangeTop";
     }
+
+    public String getCheckboxValue() {
+        return "true";
+    }
 }

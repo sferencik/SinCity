@@ -74,8 +74,8 @@ public class ManualTriggerController extends BaseActionController {
                         oldBuild,
                         rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
-                        cbSetBuildProblemJsonParameterString != null && Boolean.valueOf(cbSetBuildProblemJsonParameterString),
-                        cbSetTestFailureJsonParameterString != null && Boolean.valueOf(cbSetTestFailureJsonParameterString),
+                        cbSetBuildProblemJsonParameterString != null && cbSetBuildProblemJsonParameterString.equals(settingNames.getCheckboxValue()),
+                        cbSetTestFailureJsonParameterString != null && cbSetTestFailureJsonParameterString.equals(settingNames.getCheckboxValue()),
                         buildCustomizerFactory)
                     .triggerCulpritFindingIfNeeded();
             }
