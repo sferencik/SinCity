@@ -1,6 +1,7 @@
 package sferencik.teamcity.sincity;
 
 import jetbrains.buildServer.log.Loggers;
+import jetbrains.buildServer.parameters.ValueResolver;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.util.StringUtil;
 
@@ -34,14 +35,17 @@ public class BuildTagger {
         String tagParameterName = StringUtil.isEmpty(sincityRangeTopBuildId)
                 ? settingNames.getTagNameForBuildsNotTriggeredBySinCity()
                 : settingNames.getTagNameForBuildsTriggeredBySinCity();
-        final String tagName = sinCityParameters.get(tagParameterName);
 
-        if (StringUtil.isEmpty(tagName))
+        String unresolvedTagName = sinCityParameters.get(tagParameterName);
+        if (StringUtil.isEmpty(unresolvedTagName))
             return;
 
-        Loggers.SERVER.debug("[SinCity] tagging build with '" + tagName + "'");
+        ValueResolver resolver = build.getValueResolver();
+        final String resolvedTagName = resolver.resolve(unresolvedTagName).getResult();
+
+        Loggers.SERVER.debug("[SinCity] tagging build with '" + resolvedTagName + "'");
         final List<String> resultingTags = new ArrayList<String>(build.getTags());
-        resultingTags.add(tagName);
+        resultingTags.add(resolvedTagName);
         build.setTags(resultingTags);
     }
 
