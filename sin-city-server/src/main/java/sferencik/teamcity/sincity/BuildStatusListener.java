@@ -10,7 +10,8 @@ import java.util.Map;
 public class BuildStatusListener
 {
     public BuildStatusListener(@NotNull final EventDispatcher<BuildServerListener> listener,
-                               final BuildCustomizerFactory buildCustomizerFactory)
+                               final BuildCustomizerFactory buildCustomizerFactory,
+                               final BuildQueue buildQueue)
     {
         listener.addListener(new BuildServerAdapter()
         {
@@ -71,7 +72,8 @@ public class BuildStatusListener
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         cbSetBuildProblemJsonParameterString != null && cbSetBuildProblemJsonParameterString.equals(settingNames.getCheckboxValue()),
                         cbSetTestFailureJsonParameterString != null && cbSetTestFailureJsonParameterString.equals(settingNames.getCheckboxValue()),
-                        buildCustomizerFactory
+                        buildCustomizerFactory,
+                        buildQueue
                 )
                     .triggerCulpritFindingIfNeeded();
             }

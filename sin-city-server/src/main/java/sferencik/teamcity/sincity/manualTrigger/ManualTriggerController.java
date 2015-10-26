@@ -3,6 +3,7 @@ package sferencik.teamcity.sincity.manualTrigger;
 import jetbrains.buildServer.controllers.BaseActionController;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.BuildCustomizerFactory;
+import jetbrains.buildServer.serverSide.BuildQueue;
 import jetbrains.buildServer.serverSide.BuildsManager;
 import jetbrains.buildServer.serverSide.SFinishedBuild;
 import jetbrains.buildServer.util.StringUtil;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class ManualTriggerController extends BaseActionController {
 
-    public ManualTriggerController(WebControllerManager controllerManager, final BuildCustomizerFactory buildCustomizerFactory, final BuildsManager buildsManager) {
+    public ManualTriggerController(WebControllerManager controllerManager, final BuildCustomizerFactory buildCustomizerFactory, final BuildsManager buildsManager, final BuildQueue buildQueue) {
         super(controllerManager);
 
         final SettingNames settingNames = new SettingNames();
@@ -76,7 +77,8 @@ public class ManualTriggerController extends BaseActionController {
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         cbSetBuildProblemJsonParameterString != null && cbSetBuildProblemJsonParameterString.equals(settingNames.getCheckboxValue()),
                         cbSetTestFailureJsonParameterString != null && cbSetTestFailureJsonParameterString.equals(settingNames.getCheckboxValue()),
-                        buildCustomizerFactory)
+                        buildCustomizerFactory,
+                        buildQueue)
                     .triggerCulpritFindingIfNeeded();
             }
         });

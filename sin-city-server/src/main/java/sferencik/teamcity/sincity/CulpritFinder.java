@@ -1,5 +1,6 @@
 package sferencik.teamcity.sincity;
 
+import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
@@ -21,6 +22,7 @@ public class CulpritFinder {
     @NotNull private final String triggerOnTestFailure;
     private final boolean setBuildProblemJsonParameter;
     private final boolean setTestFailureJsonParameter;
+    @NotNull private final BuildQueue buildQueue;
     @NotNull private final BuildCustomizerFactory buildCustomizerFactory;
 
     /**
@@ -41,7 +43,9 @@ public class CulpritFinder {
                          @NotNull String triggerOnTestFailure,
                          boolean setBuildProblemJsonParameter,
                          boolean setTestFailureJsonParameter,
-                         @NotNull BuildCustomizerFactory buildCustomizerFactory) {
+                         @NotNull BuildCustomizerFactory buildCustomizerFactory,
+                         @NotNull BuildQueue buildQueue
+                         ) {
 
         this.newBuild = newBuild;
         this.oldBuild = oldBuild;
@@ -50,6 +54,7 @@ public class CulpritFinder {
         this.triggerOnTestFailure = triggerOnTestFailure;
         this.setBuildProblemJsonParameter = setBuildProblemJsonParameter;
         this.setTestFailureJsonParameter = setTestFailureJsonParameter;
+        this.buildQueue = buildQueue;
 
         Loggers.SERVER.debug("[SinCity] culprit finding " +
                 (oldBuild == null
@@ -179,8 +184,9 @@ public class CulpritFinder {
 
             buildCustomizer.setChangesUpTo(change);
 
-            buildCustomizer.createPromotion().addToQueue(
+            SQueuedBuild queuedBuild = buildCustomizer.createPromotion().addToQueue(
                     "SinCity; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
+            moveBuildBeyondAllCulpritFindingBuilds(queuedBuild);
         }
     }
 
@@ -253,5 +259,56 @@ public class CulpritFinder {
             changeList.addAll(buildPromotion.getContainingChanges());
             buildPromotion = buildPromotion.getPreviousBuildPromotion(SelectPrevBuildPolicy.SINCE_LAST_BUILD);
         }
+    }
+
+    private void moveBuildBeyondAllCulpritFindingBuilds(SQueuedBuild buildToMove) {
+
+        List<SQueuedBuild> queuedBuilds = buildQueue.getItems();
+        ListIterator<SQueuedBuild> queueIterator = queuedBuilds.listIterator(queuedBuilds.size());
+        boolean isBuildToMoveSeen = false;
+
+        // iterate the queue bottom-to-top, until we find the bottom-most culprit-finding build in it
+        while (queueIterator.hasPrevious()) {
+            int iteratedBuildIndex = queueIterator.previousIndex();
+            SQueuedBuild iteratedBuild = queueIterator.previous();
+
+            if (iteratedBuild.equals(buildToMove)) {
+                // this is the build we're trying to move up (presumably somewhere near the end of the queue); make a
+                // note of it but otherwise leave it where it is for now
+                Loggers.SERVER.debug("[SinCity] build seen at position " + iteratedBuildIndex);
+                isBuildToMoveSeen = true;
+                continue;
+            }
+
+            if (!StringUtil.isEmpty(iteratedBuild.getBuildPromotion().getCustomParameters().get(new ParameterNames().getSincityRangeTopBuildId()))) {
+                // we have found a culprit-finding build in the queue (since we're iterating bottom-up, this is the
+                // bottom-most culprit-finding build)
+                if (isBuildToMoveSeen) {
+                    // ... and our build is below it; move it up
+                    moveBuildToPosition(buildToMove, queuedBuilds, iteratedBuildIndex + 1);
+                }
+                else {
+                    // ... and our build is nowhere to be seen; do nothing
+                }
+                return;
+            }
+        }
+
+        if (isBuildToMoveSeen) {
+            // we haven't found any culprit-finding build in the queue, so let's move ours all the way to the top
+            moveBuildToPosition(buildToMove, queuedBuilds, 0);
+        }
+    }
+
+    private void moveBuildToPosition(SQueuedBuild buildToMove, List<SQueuedBuild> queuedBuilds, int newBuildPosition) {
+
+        queuedBuilds.remove(buildToMove);
+        queuedBuilds.add(newBuildPosition, buildToMove);
+        Loggers.SERVER.debug("[SinCity] build moved to position " + newBuildPosition);
+
+        List<String> queuedItemIds = new ArrayList<String>();
+        for (SQueuedBuild build : queuedBuilds)
+            queuedItemIds.add(build.getItemId());
+        buildQueue.applyOrder(queuedItemIds.toArray(new String[queuedItemIds.size()]));
     }
 }
