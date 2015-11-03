@@ -50,11 +50,9 @@ public class ParamsToFiles {
     void storeIfSet() {
         final ParameterNames parameterNames = new ParameterNames();
         String buildTempDirectory = build.getBuildTempDirectory().getAbsolutePath();
-        final FileNames fileNames = new FileNames();
 
-
-        File buildProblemJsonFile = new File(new File(buildTempDirectory), fileNames.getBuildProblemJsonFilename());
-        File testFailureJsonFile = new File(new File(buildTempDirectory), fileNames.getTestFailureJsonFilename());
+        File buildProblemJsonFile = new File(new File(buildTempDirectory), getSincityBuildProblemsJsonFilename());
+        File testFailureJsonFile = new File(new File(buildTempDirectory), getSincityTestFailuresJsonFilename());
 
         Loggers.AGENT.debug("[SinCity] " + buildProblemJsonFile + " " + (buildProblemJsonFile.exists() ? "exists" : "does not exist"));
         Loggers.AGENT.debug("[SinCity] " + testFailureJsonFile + " " + (testFailureJsonFile.exists() ? "exists" : "does not exist"));
@@ -63,5 +61,13 @@ public class ParamsToFiles {
                 buildProblemJsonFile.toString());
         writeParameterToFileIfSet(parameterNames.getSincityTestFailures(),
                 testFailureJsonFile.toString());
+    }
+
+    private static String getSincityTestFailuresJsonFilename() {
+        return new ParameterNames().getSincityTestFailures();
+    }
+
+    private static String getSincityBuildProblemsJsonFilename() {
+        return new ParameterNames().getSincityBuildProblems();
     }
 }

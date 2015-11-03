@@ -29,23 +29,11 @@ public class SettingNames {
         return "All";
     }
 
-    public String getCbSetBuildProblemJsonParameter() {
-        return "sincity.cbSetBuildProblemJsonParameter";
-    }
-
-    public String getCbSetTestFailureJsonParameter() {
-        return "sincity.cbSetTestFailureJsonParameter";
-    }
-
     public String getRbRangeBottom() {
         return "sincity.rbRangeBottom";
     }
 
     public String getRbRangeTop() {
         return "sincity.rbRangeTop";
-    }
-
-    public String getCheckboxValue() {
-        return "true";
     }
 }

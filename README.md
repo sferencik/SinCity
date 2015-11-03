@@ -36,20 +36,19 @@ one), then bisect and run another one and then another.
 
 To enable the plugin for a build configuration, add it as a Build feature.
 
-The build-feature dialog lets you specify the following settings:
-
-#### Tagging: tell SinCity and non-SinCity builds apart
+### Tagging: tell SinCity and non-SinCity builds apart
 
 You can tag all the builds triggered by SinCity (the culprit-finding ones) as well as all the builds *not* triggered by
-SinCity. Specify the tag names you want to use. If empty, no tagging is done.
+SinCity. Specify the tag names you want to use in the build-feature dialog (if you leave the text fields empty, no
+tagging is done).
 
 One of the tags is useful if you want to show only the SinCity builds; the other if you want to *hide* them from the
 view.
 
-#### Triggering: what counts as failure worth hunting down
+### Triggering: what counts as failure worth hunting down
 
 The plugin inspects a failing build for two kinds of failures:
-1. high-level build problems (e.g. Powershell runner 2 returned a non-zero exit code, Command-line runner 1 timed out,
+1. high-level build problems (e.g. Powershell runner #2 returned a non-zero exit code, Command-line runner #1 timed out,
    There are failing tests)
 2. individual test failures (e.g. *MySuite: my.test.package.MyClass.myTest* failed)
 
@@ -59,23 +58,22 @@ options are:
 * New (i.e. only trigger culprit finding if this is a new error)
 * All (i.e. trigger culprit finding even if this error already occurred in the previous build)
 
+Use the radio buttons in the build-feature dialog to specify the desired triggering behaviour.
+
 Setting both options to "No" is effectively the same as disabling culprit-finding completely (except that completed
 builds will still be tagged as per above).
 
-#### Parameters: tell each culprit-finding build what it's investigating
+### Parameters: each culprit-finding "knows" what it's investigating
 
-You can tell each triggered culprit-finding build what failures it is "investigating." This is passed down in the form
-of two build parameters and two files in the build temporary directory, one for each kind of failure described above
-(high-level build problems, individual test failures). Enable this feature by checking the respective checkboxes.
+Each triggered culprit-finding build is sent the list of failures it is "investigating." This is passed down in the form
+of two build parameters (`%sincity.build.problems.json%` and `%sincity.test.failures.json%`) and two files in the build
+temporary directory (`<buildTmp>/sincity.build.problems.json` and `<buildTmp>/sincity.test.failures.json`),
+corresponding to each kind of failure described above (high-level build problems, individual test failures).
 
 This can be useful to help your build focus on the failures. For example, your build may be able to run the failed tests
-first. Or to run *only* the failed tests. To find what the failures are, the build configuration must do its own parsing
-of the two JSON-string parameters.
+first. Or run *only* the failed tests. To find what the failures are, the build configuration must do its own parsing of
+the two JSON-string parameters.
 
 ## Future improvements
 
 * binary search - maybe
-* for every triggered build, set a parameter containing a JSON string with the list of failures which merited the
-  culprit finding
-* add a button to the build configuration overview (next to the Run button) which lets you manually trigger SinCity
-  for any pair of builds

@@ -62,16 +62,12 @@ public class BuildStatusListener
 
                 String rbTriggerOnBuildProblems = parameters.get(settingNames.getRbTriggerOnBuildProblem());
                 String rbTriggerOnTestFailures = parameters.get(settingNames.getRbTriggerOnTestFailure());
-                String cbSetBuildProblemJsonParameterString = parameters.get(settingNames.getCbSetBuildProblemJsonParameter());
-                String cbSetTestFailureJsonParameterString = parameters.get(settingNames.getCbSetTestFailureJsonParameter());
 
                 new CulpritFinder(
                         build,
                         build.getPreviousFinished(),
                         rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
-                        cbSetBuildProblemJsonParameterString != null && cbSetBuildProblemJsonParameterString.equals(settingNames.getCheckboxValue()),
-                        cbSetTestFailureJsonParameterString != null && cbSetTestFailureJsonParameterString.equals(settingNames.getCheckboxValue()),
                         buildCustomizerFactory,
                         buildQueue
                 )

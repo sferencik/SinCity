@@ -20,8 +20,6 @@ public class CulpritFinder {
     @Nullable private final SFinishedBuild oldBuild;
     @NotNull private final String triggerOnBuildProblem;
     @NotNull private final String triggerOnTestFailure;
-    private final boolean setBuildProblemJsonParameter;
-    private final boolean setTestFailureJsonParameter;
     @NotNull private final BuildQueue buildQueue;
     @NotNull private final BuildCustomizerFactory buildCustomizerFactory;
 
@@ -33,27 +31,21 @@ public class CulpritFinder {
      *                 build configuration.
      * @param triggerOnBuildProblem
      * @param triggerOnTestFailure
-     * @param setBuildProblemJsonParameter
-     * @param setTestFailureJsonParameter
      * @param buildCustomizerFactory
      */
     public CulpritFinder(@NotNull SBuild newBuild,
                          @Nullable SFinishedBuild oldBuild,
                          @NotNull String triggerOnBuildProblem,
                          @NotNull String triggerOnTestFailure,
-                         boolean setBuildProblemJsonParameter,
-                         boolean setTestFailureJsonParameter,
                          @NotNull BuildCustomizerFactory buildCustomizerFactory,
                          @NotNull BuildQueue buildQueue
-                         ) {
+    ) {
 
         this.newBuild = newBuild;
         this.oldBuild = oldBuild;
         this.buildCustomizerFactory = buildCustomizerFactory;
         this.triggerOnBuildProblem = triggerOnBuildProblem;
         this.triggerOnTestFailure = triggerOnTestFailure;
-        this.setBuildProblemJsonParameter = setBuildProblemJsonParameter;
-        this.setTestFailureJsonParameter = setTestFailureJsonParameter;
         this.buildQueue = buildQueue;
 
         Loggers.SERVER.debug("[SinCity] culprit finding " +
@@ -202,10 +194,8 @@ public class CulpritFinder {
         parameters.put(parameterNames.getSincityRangeBottomBuildNumber(), oldBuild == null
                 ? "n/a"
                 : oldBuild.getBuildNumber());
-        if (setBuildProblemJsonParameter)
-            parameters.put(parameterNames.getSincityBuildProblems(), Encoder.encodeBuildProblems(getRelevantBuildProblems()));
-        if (setTestFailureJsonParameter)
-            parameters.put(parameterNames.getSincityTestFailures(), Encoder.encodeTestNames(getRelevantTestFailures()));
+        parameters.put(parameterNames.getSincityBuildProblems(), Encoder.encodeBuildProblems(getRelevantBuildProblems()));
+        parameters.put(parameterNames.getSincityTestFailures(), Encoder.encodeTestNames(getRelevantTestFailures()));
         return parameters;
     }
 

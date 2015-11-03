@@ -4,8 +4,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <jsp:useBean id="settingName" class="sferencik.teamcity.sincity.SettingNames"/>
-<jsp:useBean id="parameterName" class="sferencik.teamcity.sincity.ParameterNames"/>
-<jsp:useBean id="fileName" class="sferencik.teamcity.sincity.FileNames"/>
 <jsp:useBean id="formTarget" class="sferencik.teamcity.sincity.manualTrigger.FormTarget"/>
 
 <form action="<c:url value="${formTarget.url}"/>" id="triggerSinCity" method="post" class="clearfix">
@@ -30,33 +28,6 @@
                             <input type="radio" name="${settingName.rbTriggerOnTestFailure}" value="${settingName.triggerOnNew}" ${empty sinCityParameters or sinCityParameters[settingName.rbTriggerOnTestFailure] == settingName.triggerOnNew ? "checked" : ""} /> new (default)<br/>
                             <input type="radio" name="${settingName.rbTriggerOnTestFailure}" value="${settingName.triggerOnAll}" ${sinCityParameters[settingName.rbTriggerOnTestFailure] == settingName.triggerOnAll ? "checked" : ""} /> all<br/>
                             <span class="smallNote">Should culprit-finding builds be kicked on test failures?</span>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <th>Parameters</th>
-            <td>
-                <table>
-                    <tr>
-                        <th>Build problems</th>
-                        <th>Test failures</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="${settingName.cbSetBuildProblemJsonParameter}" value="${settingName.checkboxValue}" id="${settingName.cbSetBuildProblemJsonParameter}" ${sinCityParameters[settingName.cbSetBuildProblemJsonParameter] ? "checked" : ""} /> send as JSON<br/>
-                            <span class="smallNote">If checked, the culprit-finding builds will receive a list of build
-                            problems as a JSON structure. This has the form of a build parameter
-                            (<code>${parameterName.sincityBuildProblems}</code>) and a JSON file (<code>&lt;build temp
-                            dir&gt;/${fileName.buildProblemJsonFilename}</code>).</span>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="${settingName.cbSetTestFailureJsonParameter}" value="${settingName.checkboxValue}" id="${settingName.cbSetTestFailureJsonParameter}" ${sinCityParameters[settingName.cbSetTestFailureJsonParameter] ? "checked" : ""} /> send as JSON<br/>
-                            <span class="smallNote">If checked, the culprit-finding builds will receive a list of test
-                            failures as a JSON structure. This has the form of a build parameter
-                            (<code>${parameterName.sincityTestFailures}</code>) and a JSON file (<code>&lt;build temp
-                            dir&gt;/${fileName.testFailureJsonFilename}</code>).</span>
                         </td>
                     </tr>
                 </table>

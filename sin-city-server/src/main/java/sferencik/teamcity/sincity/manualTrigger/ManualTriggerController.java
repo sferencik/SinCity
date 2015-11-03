@@ -68,15 +68,11 @@ public class ManualTriggerController extends BaseActionController {
 
                 String rbTriggerOnBuildProblems = httpServletRequest.getParameter(settingNames.getRbTriggerOnBuildProblem());
                 String rbTriggerOnTestFailures = httpServletRequest.getParameter(settingNames.getRbTriggerOnTestFailure());
-                String cbSetBuildProblemJsonParameterString = httpServletRequest.getParameter(settingNames.getCbSetBuildProblemJsonParameter());
-                String cbSetTestFailureJsonParameterString = httpServletRequest.getParameter(settingNames.getCbSetTestFailureJsonParameter());
 
                 new CulpritFinder(newBuild,
                         oldBuild,
                         rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
-                        cbSetBuildProblemJsonParameterString != null && cbSetBuildProblemJsonParameterString.equals(settingNames.getCheckboxValue()),
-                        cbSetTestFailureJsonParameterString != null && cbSetTestFailureJsonParameterString.equals(settingNames.getCheckboxValue()),
                         buildCustomizerFactory,
                         buildQueue)
                     .triggerCulpritFindingIfNeeded();
