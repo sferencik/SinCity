@@ -70,7 +70,8 @@ public class BuildStatusListener
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         buildCustomizerFactory,
                         buildQueue,
-                        true
+                        true,
+                        "SinCity"
                 )
                     .triggerCulpritFindingIfNeeded();
             }

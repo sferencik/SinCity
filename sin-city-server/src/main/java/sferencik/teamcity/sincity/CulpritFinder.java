@@ -22,6 +22,7 @@ public class CulpritFinder {
     @NotNull private final String triggerOnTestFailure;
     @NotNull private final BuildQueue buildQueue;
     private final boolean putBuildsToQueueTop;
+    @NotNull private String triggeredBy;
     @NotNull private final BuildCustomizerFactory buildCustomizerFactory;
 
     /**
@@ -34,6 +35,7 @@ public class CulpritFinder {
      * @param triggerOnTestFailure
      * @param buildCustomizerFactory
      * @param putBuildsToQueueTop should the culprit finding builds be given higher priority?
+     * @param triggeredBy identify who triggered the batch; this is only used in the "triggered by" message
      */
     public CulpritFinder(@NotNull SBuild newBuild,
                          @Nullable SFinishedBuild oldBuild,
@@ -41,7 +43,8 @@ public class CulpritFinder {
                          @NotNull String triggerOnTestFailure,
                          @NotNull BuildCustomizerFactory buildCustomizerFactory,
                          @NotNull BuildQueue buildQueue,
-                         boolean putBuildsToQueueTop) {
+                         boolean putBuildsToQueueTop,
+                         @NotNull String triggeredBy) {
 
         this.newBuild = newBuild;
         this.oldBuild = oldBuild;
@@ -50,6 +53,7 @@ public class CulpritFinder {
         this.triggerOnTestFailure = triggerOnTestFailure;
         this.buildQueue = buildQueue;
         this.putBuildsToQueueTop = putBuildsToQueueTop;
+        this.triggeredBy = triggeredBy;
 
         Loggers.SERVER.debug("[SinCity] culprit finding " +
                 (oldBuild == null
@@ -180,7 +184,7 @@ public class CulpritFinder {
             buildCustomizer.setChangesUpTo(change);
 
             SQueuedBuild queuedBuild = buildCustomizer.createPromotion().addToQueue(
-                    "SinCity; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
+                    triggeredBy + "; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
 
             if (putBuildsToQueueTop)
                 moveBuildBeyondAllCulpritFindingBuilds(queuedBuild);

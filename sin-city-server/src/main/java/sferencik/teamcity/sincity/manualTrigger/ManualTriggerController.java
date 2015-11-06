@@ -9,6 +9,7 @@ import jetbrains.buildServer.serverSide.SFinishedBuild;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
+import jetbrains.buildServer.web.util.SessionUser;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
@@ -75,7 +76,9 @@ public class ManualTriggerController extends BaseActionController {
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         buildCustomizerFactory,
                         buildQueue,
-                        false)
+                        false,
+                        SessionUser.getUser(httpServletRequest).getDescriptiveName()
+                )
                     .triggerCulpritFindingIfNeeded();
             }
         });
