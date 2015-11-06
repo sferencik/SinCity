@@ -69,7 +69,8 @@ public class BuildStatusListener
                         rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         buildCustomizerFactory,
-                        buildQueue
+                        buildQueue,
+                        true
                 )
                     .triggerCulpritFindingIfNeeded();
             }

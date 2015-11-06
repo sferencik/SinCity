@@ -21,6 +21,7 @@ public class CulpritFinder {
     @NotNull private final String triggerOnBuildProblem;
     @NotNull private final String triggerOnTestFailure;
     @NotNull private final BuildQueue buildQueue;
+    private final boolean putBuildsToQueueTop;
     @NotNull private final BuildCustomizerFactory buildCustomizerFactory;
 
     /**
@@ -32,14 +33,15 @@ public class CulpritFinder {
      * @param triggerOnBuildProblem
      * @param triggerOnTestFailure
      * @param buildCustomizerFactory
+     * @param putBuildsToQueueTop should the culprit finding builds be given higher priority?
      */
     public CulpritFinder(@NotNull SBuild newBuild,
                          @Nullable SFinishedBuild oldBuild,
                          @NotNull String triggerOnBuildProblem,
                          @NotNull String triggerOnTestFailure,
                          @NotNull BuildCustomizerFactory buildCustomizerFactory,
-                         @NotNull BuildQueue buildQueue
-    ) {
+                         @NotNull BuildQueue buildQueue,
+                         boolean putBuildsToQueueTop) {
 
         this.newBuild = newBuild;
         this.oldBuild = oldBuild;
@@ -47,6 +49,7 @@ public class CulpritFinder {
         this.triggerOnBuildProblem = triggerOnBuildProblem;
         this.triggerOnTestFailure = triggerOnTestFailure;
         this.buildQueue = buildQueue;
+        this.putBuildsToQueueTop = putBuildsToQueueTop;
 
         Loggers.SERVER.debug("[SinCity] culprit finding " +
                 (oldBuild == null
@@ -178,7 +181,9 @@ public class CulpritFinder {
 
             SQueuedBuild queuedBuild = buildCustomizer.createPromotion().addToQueue(
                     "SinCity; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
-            moveBuildBeyondAllCulpritFindingBuilds(queuedBuild);
+
+            if (putBuildsToQueueTop)
+                moveBuildBeyondAllCulpritFindingBuilds(queuedBuild);
         }
     }
 

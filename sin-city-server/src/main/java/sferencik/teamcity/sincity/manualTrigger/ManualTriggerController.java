@@ -74,7 +74,8 @@ public class ManualTriggerController extends BaseActionController {
                         rbTriggerOnBuildProblems == null ? triggerOnNew : rbTriggerOnBuildProblems,
                         rbTriggerOnTestFailures == null ? triggerOnNew : rbTriggerOnTestFailures,
                         buildCustomizerFactory,
-                        buildQueue)
+                        buildQueue,
+                        false)
                     .triggerCulpritFindingIfNeeded();
             }
         });
