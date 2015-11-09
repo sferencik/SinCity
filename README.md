@@ -53,17 +53,17 @@ Each build triggered by SinCity receives the following configuration parameters:
   name of the commit, not the internal TeamCity number
 * `%sincity.build.problems.json%` and `%sincity.test.failures.json%`: JSON strings describing the build problems and/or test
   failures that triggered the build
- * each JSON string contains an array of JSON objects, one per build problem/test failure; only those issues are
-   included which are responsible for the build being triggered, i.e. if the [triggering
-   setting](#what-counts-as-build-failure) is "*No* triggering on build problems and triggering on *new* test failures",
-   `%sincity.build.problems.json%` will be set to the empty array (`[]` in JSON) and `%sincity.test.failures.json%` will
-   only contain the new test failures
- * the JSON strings can be useful to help your culprit-finding builds focus on the failures; for example, your build may
-   be able to run the failed tests first or run the failed tests *only*; to find what the failures are, the build
-   configuration must do its own parsing of the two JSON-string parameters
- * to further simplify the use of these JSON strings, SinCity also writes their values to JSON *files* at
-   `%system.teamcity.build.tempDir%/sincity.build.problems.json` and
-   `%system.teamcity.build.tempDir%/sincity.test.failures.json`
+    * each JSON string contains an array of JSON objects, one per build problem/test failure; only those issues are
+      included which are responsible for the build being triggered, i.e. if the [triggering
+      setting](#what-counts-as-build-failure) is "*No* triggering on build problems and triggering on *new* test
+      failures", `%sincity.build.problems.json%` will be set to the empty array (`[]` in JSON) and
+      `%sincity.test.failures.json%` will only contain the new test failures
+    * the JSON strings can be useful to help your culprit-finding builds focus on the failures; for example, your build
+      may be able to run the failed tests first or run the failed tests *only*; to find what the failures are, the build
+      configuration must do its own parsing of the two JSON-string parameters
+    * to further simplify the use of these JSON strings, SinCity also writes their values to JSON *files* at
+      `%system.teamcity.build.tempDir%/sincity.build.problems.json` and
+      `%system.teamcity.build.tempDir%/sincity.test.failures.json`
 
 NB: All the builds triggered within one culprit-finding investigation have identical values of all the parameters above
 except for `%sincity.suspect.change%` (which is different for each build). This parameter is thus important in preventing
