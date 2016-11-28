@@ -38,7 +38,7 @@
             <td>
                 <c:forEach items="${buildsWithChanges}" var="buildWithChange" varStatus="loop">
                     <c:set var="build" value="${buildWithChange.build}" />
-                    <c:set var="change" value="${buildWithChange.change}" />
+                    <c:set var="lastChange" value="${buildWithChange.lastChange}" />
 
                     <!-- if there are more than 20 builds, start by showing only the top 20 plus a "Show all builds" button -->
                     <c:if test="${loop.index == 20}">
@@ -75,9 +75,9 @@
                     ${fn:toLowerCase(build.buildStatus.text)};
 
                     <%-- ~ last change 654321 by dylanbob, "Don’t criticize what you can’t understand.") --%>
-                    <c:set var="changeDesc" value="${change.description}" />
+                    <c:set var="changeDesc" value="${lastChange.description}" />
                     <c:set var="changeDescLimit" value="100" />
-                    last change ${change.displayVersion} by ${change.userName}, "${changeDesc.length() > changeDescLimit ? changeDesc.substring(0, changeDescLimit - 3) : changeDesc}")
+                    last change ${lastChange.displayVersion} by ${lastChange.userName}, "${changeDesc.length() > changeDescLimit ? changeDesc.substring(0, changeDescLimit - 3) : changeDesc}")
 
                     <br/>
                 </c:forEach>

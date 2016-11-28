@@ -1,4 +1,4 @@
-package sferencik.teamcity.sincity;
+package sferencik.teamcity.sincity.autoTrigger;
 
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;

@@ -2,11 +2,10 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="constructor">
     <bean class="sferencik.teamcity.sincity.SinCityBuildFeature" />
-    <bean class="sferencik.teamcity.sincity.SettingsPageController" />
-    <bean class="sferencik.teamcity.sincity.BuildStatusListener" />
+    <bean class="sferencik.teamcity.sincity.autoTrigger.SettingsPageController" />
+    <bean class="sferencik.teamcity.sincity.autoTrigger.BuildStatusListener" />
 
     <bean class="sferencik.teamcity.sincity.manualTrigger.ManualTriggerController "/>
-    <bean class="sferencik.teamcity.sincity.manualTrigger.ManualTriggerTab">
-        <property name="includeUrl" value="triggerCulpritFinding.jsp"/>
-    </bean>
+    <bean class="sferencik.teamcity.sincity.manualTrigger.ManualTriggerTab" />
+    <bean class="sferencik.teamcity.sincity.failureCulpritOverview.FailureCulpritOverviewTab" />
 </beans>

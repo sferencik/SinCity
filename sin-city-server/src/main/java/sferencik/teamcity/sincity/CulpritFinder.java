@@ -4,7 +4,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
-import jetbrains.buildServer.tests.TestInfo;
 import jetbrains.buildServer.tests.TestName;
 import jetbrains.buildServer.vcs.SVcsModification;
 import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
@@ -95,10 +94,9 @@ public class CulpritFinder {
         triggerCulpritFinding(changesBetweenBuilds);
     }
 
-    private List<BuildProblemData> getRelevantBuildProblems()
+    List<BuildProblemData> getRelevantBuildProblems()
     {
         SettingNames settingNames = new SettingNames();
-
 
         if (triggerOnBuildProblem.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] build problems do not trigger");
@@ -118,8 +116,20 @@ public class CulpritFinder {
                 : oldBuild.getFailureReasons();
         Loggers.SERVER.debug("[SinCity] previous build's problems: " + previousBuildProblems);
 
-        final List<BuildProblemData> newProblems = new ArrayList<BuildProblemData>(thisBuildProblems);
-        newProblems.removeAll(previousBuildProblems);
+        // OK, so we're only interested in *new* build problems; subtract "this minus previous"; however, use
+        // BuildProblemDataWithCustomComparator to correctly assess the equality of artifact dependency failures (see
+        // comments in that class)
+        final List<BuildProblemDataWithCustomComparator> newProblemsWithCustomComparator = new ArrayList<BuildProblemDataWithCustomComparator>();
+        for (BuildProblemData thisBuildProblem : thisBuildProblems)
+            newProblemsWithCustomComparator.add(new BuildProblemDataWithCustomComparator(thisBuildProblem));
+
+        for (BuildProblemData previousBuildProblem : previousBuildProblems)
+            newProblemsWithCustomComparator.remove(new BuildProblemDataWithCustomComparator(previousBuildProblem));
+
+        final List<BuildProblemData> newProblems = new ArrayList<BuildProblemData>();
+        for (BuildProblemDataWithCustomComparator newProblemWithCustomSeparator : newProblemsWithCustomComparator)
+            newProblems.add(newProblemWithCustomSeparator.getBuildProblemData());
+
         Loggers.SERVER.debug("[SinCity] new build problems: " + newProblems);
         Loggers.SERVER.debug("[SinCity] reporting new build problems");
 
@@ -130,13 +140,12 @@ public class CulpritFinder {
     {
         SettingNames settingNames = new SettingNames();
 
-
         if (triggerOnTestFailure.equals(settingNames.getNoTrigger())) {
             Loggers.SERVER.debug("[SinCity] test failures do not trigger");
             return new ArrayList<TestName>();
         }
 
-        final List<TestName> thisBuildTestFailures = getTestNames(newBuild.getTestMessages(0, -1));
+        final List<TestName> thisBuildTestFailures = SinCityUtils.getNamesOfFailingTests(newBuild);
         Loggers.SERVER.debug("[SinCity] this build's test failures: " + thisBuildTestFailures);
 
         if (triggerOnTestFailure.equals(settingNames.getTriggerOnAll())) {
@@ -146,7 +155,7 @@ public class CulpritFinder {
 
         final List<TestName> previousBuildTestFailures = oldBuild == null
                 ? new ArrayList<TestName>()
-                : getTestNames(oldBuild.getTestMessages(0, -1));
+                : SinCityUtils.getNamesOfFailingTests(oldBuild);
         Loggers.SERVER.debug("[SinCity] previous build's test failures: " + previousBuildTestFailures);
 
         final List<TestName> relevantTestFailures = new ArrayList<TestName>(thisBuildTestFailures);
@@ -155,15 +164,6 @@ public class CulpritFinder {
         Loggers.SERVER.debug("[SinCity] reporting new test failures");
 
         return relevantTestFailures;
-    }
-
-    private List<TestName> getTestNames(List<TestInfo> tests)
-    {
-        List<TestName> testNames = new ArrayList<TestName>();
-        for (TestInfo test : tests) {
-            testNames.add(test.getTestName());
-        }
-        return testNames;
     }
 
     private void triggerCulpritFinding(List<SVcsModification> changesBetweenBuilds)
@@ -184,7 +184,7 @@ public class CulpritFinder {
             buildCustomizer.setChangesUpTo(change);
 
             SQueuedBuild queuedBuild = buildCustomizer.createPromotion().addToQueue(
-                    triggeredBy + "; investigating failures between " + oldBuild.getBuildNumber() + " and " + newBuild.getBuildNumber());
+                    triggeredBy + "; investigating failures between " + (oldBuild == null ? "the Big Bang" : oldBuild.getBuildNumber()) + " and " + newBuild.getBuildNumber());
 
             if (putBuildsToQueueTop)
                 moveBuildBeyondAllCulpritFindingBuilds(queuedBuild);
@@ -221,9 +221,7 @@ public class CulpritFinder {
         // configuration; otherwise oldBuild really should have a change associated with it
         SVcsModification oldBuildChange = null;
         if (oldBuild != null) {
-            FinishedBuildWithChange oldBuildWithChange = FinishedBuildWithChange.fromSFinishedBuild(oldBuild);
-            if (oldBuildWithChange != null)
-                oldBuildChange = oldBuildWithChange.getChange();
+            oldBuildChange = FinishedBuildWithChanges.getLastChange(oldBuild);
         }
 
         while (true) {

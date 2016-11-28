@@ -1,9 +1,11 @@
-package sferencik.teamcity.sincity;
+package sferencik.teamcity.sincity.autoTrigger;
 
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.parameters.ValueResolver;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.util.StringUtil;
+import sferencik.teamcity.sincity.ParameterNames;
+import sferencik.teamcity.sincity.SettingNames;
 
 import java.util.ArrayList;
 import java.util.List;
