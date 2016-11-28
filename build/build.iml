@@ -8,6 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="sin-city-agent" />
+    <orderEntry type="module" module-name="sin-city-common" />
     <orderEntry type="module" module-name="sin-city-server" />
   </component>
 </module>

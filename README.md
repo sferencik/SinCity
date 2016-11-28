@@ -16,7 +16,7 @@ than one commit, which is perfectly fine and probably even desirable - until som
 SinCity adds a new tab called *Trigger culprit finding* to every build configuration. In that tab, you pick two finished
 builds that will define your investigation range. SinCity then triggers builds for all the commits in that range. You
 can pick any two builds from the history; they need not have followed each other. (If you choose builds that did not
-immediately follow each other, the builds that have already ran between them will end up being _rerun_ by SinCity.)
+follow each other, the builds that ran between them will end up being rerun by SinCity.)
 
 SinCity can also be configured (per build configuration) to trigger culprit finding automatically whenever builds fail.
 Read more [below](#automatic-culprit-finding).
@@ -44,7 +44,7 @@ The default behaviour is as shown above, i.e. investigate only if there are new 
 Each build triggered by SinCity receives the following configuration parameters:
 
 * `%sincity.range.bottom.build.id%` and `%sincity.range.top.build.id%`: the build IDs (internal TeamCity IDs) of the two
-  builds that define the culprit-finding range; these references allow your triggered builds to ask questions about the
+  builds that define the culprit-finding range; these references allow your triggered builds ask questions about the
   original builds (e.g. using the TeamCity REST API)
 * `%sincity.range.bottom.build.number%` and `%sincity.range.top.build.number%`: the build numbers (display numbers) of the
   two builds that define the culprit-finding range; these are mostly for user convenience, so you can quickly see what
@@ -69,7 +69,7 @@ NB: All the builds triggered within one culprit-finding investigation have ident
 except for `%sincity.suspect.change%` (which is different for each build). This parameter is thus important in preventing
 TeamCity from thinking that all the builds are equivalent and removing some of them from the queue (as part of the build
 queue optimisation). Read more about the build queue optimisation
-[here](https://confluence.jetbrains.com/display/TCD9/Build+Queue#BuildQueue-BuildQueueOptimizationbyTeamCity).
+[https://confluence.jetbrains.com/display/TCD9/Build+Queue#BuildQueue-BuildQueueOptimizationbyTeamCity](here).
 
 ## Automatic culprit finding
 

@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TestNG:  Unit Test</title>
+<style type="text/css">
+table caption,table.info_table,table.result,table.passed,table.failed {margin-bottom:10px;border:1px solid #000099;border-collapse:collapse;empty-cells:show;}
+table.info_table td,table.info_table th,table.result td,table.result th,table.passed td,table.passed th,table.failed td,table.failed th {
+border:1px solid #000099;padding:.25em .5em .25em .5em
+}
+table.result th {vertical-align:bottom}
+tr.param th {padding-left:1em;padding-right:1em}
+tr.param td {padding-left:.5em;padding-right:2em}
+td.numi,th.numi,td.numi_attn {
+text-align:right
+}
+tr.total td {font-weight:bold}
+table caption {
+text-align:center;font-weight:bold;
+}
+table.passed tr.stripe td,table tr.passedodd td {background-color: #00AA00;}
+table.passed td,table tr.passedeven td {background-color: #33FF33;}
+table.passed tr.stripe td,table tr.skippedodd td {background-color: #cccccc;}
+table.passed td,table tr.skippedodd td {background-color: #dddddd;}
+table.failed tr.stripe td,table tr.failedodd td,table.result td.numi_attn {background-color: #FF3333;}
+table.failed td,table tr.failedeven td,table.result tr.stripe td.numi_attn {background-color: #DD0000;}
+tr.stripe td,tr.stripe th {background-color: #E6EBF9;}
+p.totop {font-size:85%;text-align:center;border-bottom:2px black solid}
+div.shootout {padding:2em;border:3px #4854A8 solid}
+</style>
+</head>
+<body>
+<table cellspacing="0" cellpadding="0" class="result">
+<tr><th>Test</th><th class="numi">Methods<br/>Passed</th><th class="numi">Scenarios<br/>Passed</th><th class="numi"># skipped</th><th class="numi"># failed</th><th class="numi">Total<br/>Time</th><th class="numi">Included<br/>Groups</th><th class="numi">Excluded<br/>Groups</th></tr>
+<tr><td style="text-align:left;padding-right:2em">Surefire test</td><td class="numi">17</td><td class="numi">17</td><td class="numi">0</td><td class="numi">0</td><td class="numi">0.8 seconds</td><td class="numi"></td><td class="numi"></td></tr>
+</table>
+<table cellspacing="0" cellpadding="0" class="passed" id="summary">
+<tr><th>Class</th><th>Method</th><th># of<br/>Scenarios</th><th>Start</th><th>Time<br/>(ms)</th></tr>
+<tr><th colspan="4">Surefire test &#8212; passed</th></tr>
+<tr class="passedodd"><td rowspan="3">sferencik.teamcity.sincity.BuildProblemDataWithCustomComparatorTest</td><td><a href="#m1"><b>testSnapshotDependencyErrorAndArtifactDependencyErrorAreNotEqual</b>  </a></td><td class="numi">1</td><td>1476829224190</td><td class="numi">7</td></tr><tr class="passedodd"><td><a href="#m2"><b>testTwoArtifactDependencyErrorsAreEqual</b>  </a></td><td class="numi">1</td><td>1476829224198</td><td class="numi">1</td></tr><tr class="passedodd"><td><a href="#m3"><b>testTwoSnapshotDependencyErrorsAreEqual</b>  </a></td><td class="numi">1</td><td>1476829224200</td><td class="numi">0</td></tr>
+<tr class="passedeven"><td rowspan="1">sferencik.teamcity.sincity.CulpritFinderTest</td><td><a href="#m4"><b>testGetRelevantBuildProblems</b>  </a></td><td class="numi">1</td><td>1476829224316</td><td class="numi">90</td></tr>
+<tr class="passedodd"><td rowspan="8">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest</td><td><a href="#m5"><b>test00EmptyHistory</b>  </a></td><td class="numi">1</td><td>1476829224730</td><td class="numi">24</td></tr><tr class="passedodd"><td><a href="#m6"><b>test01NoOutstandingFailures</b>  </a></td><td class="numi">1</td><td>1476829224756</td><td class="numi">49</td></tr><tr class="passedodd"><td><a href="#m7"><b>test02OneChangeOneBuild</b>  </a></td><td class="numi">1</td><td>1476829224808</td><td class="numi">24</td></tr><tr class="passedodd"><td><a href="#m8"><b>test03NoChangeOneBuild</b>  </a></td><td class="numi">1</td><td>1476829224834</td><td class="numi">2</td></tr><tr class="passedodd"><td><a href="#m9"><b>test04MultipleChangesOneBuild</b>  </a></td><td class="numi">1</td><td>1476829224838</td><td class="numi">2</td></tr><tr class="passedodd"><td><a href="#m10"><b>test05FailingRecently</b>  </a></td><td class="numi">1</td><td>1476829224842</td><td class="numi">2</td></tr><tr class="passedodd"><td><a href="#m11"><b>test06NewTest</b>  </a></td><td class="numi">1</td><td>1476829224847</td><td class="numi">7</td></tr><tr class="passedodd"><td><a href="#m12"><b>test10Regression</b>  </a></td><td class="numi">1</td><td>1476829224855</td><td class="numi">2</td></tr>
+<tr class="passedeven"><td rowspan="5">sferencik.teamcity.sincity.FinishedBuildWithChangesTest</td><td><a href="#m13"><b>test01LinearHistory</b>  </a></td><td class="numi">1</td><td>1476829224929</td><td class="numi">3</td></tr><tr class="passedeven"><td><a href="#m14"><b>test02RepeatedBuild</b>  </a></td><td class="numi">1</td><td>1476829224933</td><td class="numi">2</td></tr><tr class="passedeven"><td><a href="#m15"><b>test03CulpritFinderForward</b>  </a></td><td class="numi">1</td><td>1476829224936</td><td class="numi">1</td></tr><tr class="passedeven"><td><a href="#m16"><b>test04CulpritFinderBackward</b>  </a></td><td class="numi">1</td><td>1476829224939</td><td class="numi">1</td></tr><tr class="passedeven"><td><a href="#m17"><b>test05NoChanges</b>  </a></td><td class="numi">1</td><td>1476829224940</td><td class="numi">1</td></tr>
+</table>
+<h1>Surefire test</h1>
+<h2 id="m1">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test06NewTest</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m2">sferencik.teamcity.sincity.BuildProblemDataWithCustomComparatorTest:testSnapshotDependencyErrorAndArtifactDependencyErrorAreNotEqual</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m3">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test05FailingRecently</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m4">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test10Regression</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m5">sferencik.teamcity.sincity.FinishedBuildWithChangesTest:test05NoChanges</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m6">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test00EmptyHistory</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m7">sferencik.teamcity.sincity.FinishedBuildWithChangesTest:test01LinearHistory</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m8">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test02OneChangeOneBuild</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m9">sferencik.teamcity.sincity.BuildProblemDataWithCustomComparatorTest:testTwoSnapshotDependencyErrorsAreEqual</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m10">sferencik.teamcity.sincity.BuildProblemDataWithCustomComparatorTest:testTwoArtifactDependencyErrorsAreEqual</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m11">sferencik.teamcity.sincity.CulpritFinderTest:testGetRelevantBuildProblems</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m12">sferencik.teamcity.sincity.FinishedBuildWithChangesTest:test04CulpritFinderBackward</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m13">sferencik.teamcity.sincity.FinishedBuildWithChangesTest:test02RepeatedBuild</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m14">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test03NoChangeOneBuild</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m15">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test04MultipleChangesOneBuild</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m16">sferencik.teamcity.sincity.FinishedBuildWithChangesTest:test03CulpritFinderForward</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+<h2 id="m17">sferencik.teamcity.sincity.failureCulpritOverview.AnalyserTest:test01NoOutstandingFailures</h2>
+<p class="totop"><a href="#summary">back to summary</a></p>
+</body></html>

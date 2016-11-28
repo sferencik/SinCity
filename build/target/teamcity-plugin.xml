@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+  <info>
+    <name>sin-city</name>
+    <display-name>sin-city</display-name>
+    <version>snapshot-20161018222011</version>
+    <description>Find who in a series of changelists broke the build</description>
+    <download-url>Plugin download URL</download-url>
+    <email>sferencik+sincity@gmail.com</email>
+    <vendor>
+      <name>Sam Ferencik</name>
+      <url>https://cz.linkedin.com/in/sferencik</url>
+      <logo>https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/4/000/1a9/369/2e9dbc5.jpg</logo>
+    </vendor>
+  </info>
+  <deployment use-separate-classloader="true" />
+</teamcity-plugin>
