@@ -1,3 +1,4 @@
 _tcp/config.xml
 *.zip
 **/target/**
+.idea/*
