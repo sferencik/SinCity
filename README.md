@@ -98,6 +98,11 @@ The intermediate builds triggered manually have a "Triggered by" set to "[USERNA
 The intermediate builds triggered automatically have a "Triggered by" set to "SinCity; investigating failures between
 [BUILD NUMBER BOTTOM] and [BUILD NUMBER TOP]".
 
+## Development notes
+To build, test, and package the plugin, run `mvn package` from the root directory.
+
+To deploy the plugin, copy `target/sin-city.zip` into the TeamCity plugin directory and restart the server.
+
 ## Future improvements
 
 As of November 2015, SinCity does not perform a binary search. (For that, see the slightly different [Bisect
