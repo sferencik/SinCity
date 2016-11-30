@@ -26,8 +26,8 @@ range of 6 commits between builds #5 and #6.
 When you select the two builds and click *Run*, SinCity will trigger builds for the 5 intermediate commits.
 
 You don't need to pick consecutive builds (like we did). For example, you could run the culprit finding between builds #3
-and #6. In that range there have been 5 + 4 + 6 = 15 changes, so the culprit finding would result in 14 builds. Two of these
-should be "identical" to builds #4 and #5 which have already run.
+and #6. In that range there have been 5 + 4 + 6 = 15 changes (see the screenshot at the top) so the culprit finding would
+result in 14 builds. 2 of these 14 should be effectively "reruns" of #4 and #5.
 
 ## What counts as build failure
 
@@ -45,12 +45,12 @@ choose from three options:
 
 ![What counts as build failure](/images/two-types-of-issues.PNG)
 
-The default behaviour is as shown above, i.e. investigate only if there are new build problems or new test failures.
+The default behaviour is as shown above, i.e. investigate only if there are *new* build problems or new test failures.
 
 ## Example
 
-Let's find which of the 6 commits shown above broke the test. We hit *Run* and SinCity queues 5 builds. After they've
-completed, the situation looks as follows:
+Let's find which of the 6 commits shown above broke the test. We hit *Run* at the bottom of the *Trigger culprit finding*
+tab and SinCity queues 5 builds. After they've completed, the situation looks as follows:
 
 ![overview-with-cf-builds](/images/overview-with-cf-builds.PNG)
 
@@ -64,21 +64,25 @@ test was broken by build #9, i.e. most likely by the change marked as "01:24:39"
 
 ## Configuration parameters of the triggered builds
 
-Each build triggered by SinCity receives the following configuration parameters:
+Each build triggered by SinCity will have the following configuration parameters set:
 
 * `%sincity.range.bottom.build.id%` and `%sincity.range.top.build.id%`: the build IDs (internal TeamCity IDs) of the two
   builds that define the culprit-finding range; these references allow your triggered builds to ask questions about the
-  original builds (e.g. using the TeamCity REST API)
+  original builds (e.g. using the TeamCity REST API); in our example, these were 633 and 635 respectively
 * `%sincity.range.bottom.build.number%` and `%sincity.range.top.build.number%`: the build numbers (display numbers) of the
-  two builds that define the culprit-finding range; these are mostly for user convenience, so you can quickly see what
-  range the build is investigating
-* `%sincity.suspect.change%`: the "version" of the suspect commit for which this build is running; this is the display
-  name of the commit, not the internal TeamCity number
+  two builds that define the culprit-finding range; these are mostly for user convenience, so you can quickly see what range
+  the build is investigating; in our example, these were 5 and 6 respectively
+* `%sincity.suspect.change%`: the "version" of the suspect commit for which this build is running; this is the display name
+  of the commit, not the internal TeamCity number; in our example, each of the 5 builds had a different value, e.g.
+  a296c2355c36
 * `%sincity.build.problems.json%` and `%sincity.test.failures.json%`: JSON strings describing the build problems and/or test
   failures that triggered the build
-    * each JSON string contains an array of JSON objects, one per build problem/test failure; only those issues are
-      included which are responsible for the build being triggered, i.e. if the [triggering
-      setting](#what-counts-as-build-failure) is "*No* triggering on build problems and triggering on *new* test
+    * in our example, the values were
+        * `sincity.build.problems.json` -> `[{"identity":"TC_FAILED_TESTS","type":"TC_FAILED_TESTS","description":"Failed tests detected"}]`
+        * `sincity.test.failures.json` -> `[{"fullName":"Foo: flapper","suite":"Foo: ","fullNameWithoutSuite":"flapper"}]`
+    * each JSON string contains an array of JSON objects, one per build problem/test failure
+    * only those issues are included which are responsible for the build being triggered, i.e. if the [triggering
+      setting](#what-counts-as-build-failure) is "*no* triggering on build problems and triggering on *new* test
       failures", `%sincity.build.problems.json%` will be set to the empty array (`[]` in JSON) and
       `%sincity.test.failures.json%` will only contain the new test failures
     * the JSON strings can be useful to help your culprit-finding builds focus on the failures; for example, your build
@@ -100,18 +104,24 @@ You can set your build configuration to trigger the culprit finding automaticall
 and the failing build covered more than one commit. To do so, enable the "SinCity" build feature for your build
 configuration.
 
-If you want to easily distinguish the builds triggered regularly from the builds triggered by SinCity (since they
-intermingle in the build configuration history), SinCity can apply tags to your builds. You can specify one tag for the
-regular builds and another tag for the culprit-finding builds.
+![build-feature](/images/build-feature.PNG)
+
+
+![build-feature-details](/images/build-feature-details.PNG)
+
+The bottom part of this screen should already look familiar. The settings in the top part (*Tagging*) are useful if you want
+to distinguish the builds triggered by SinCity from the other builds (since they all intermingle in the build configuration
+history). If you supply the desired tag names, SinCity will apply these tag names to all the builds in the given build
+configuration.
 
 ![Tagging](/images/tagging.PNG)
 
 If you leave the tagging text fields empty, no tagging is done.
 
-The culprit-finding builds for the intermediate commits are automatically put to the queue straight after the failing
-build completes. Given that they logically belong to the just-finished build, they are put to the *top* of the queue so
-they can run ASAP. The same is not true for manually triggered builds, since they are "merely" someone's personal
-initiative, just like when someone triggers a build manually.
+The culprit-finding builds triggered automatically are put to the queue as soon as the failing build completes. Given that
+they logically belong to the just-finished build, they are put to the *top* of the queue so they can run ASAP. The same is
+not true for manually triggered builds, since they are "merely" someone's personal initiative, just like when someone
+triggers a build manually.
 
 ## Triggered-by message
 
