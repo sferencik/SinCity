@@ -114,8 +114,6 @@ to distinguish the builds triggered by SinCity from the other builds (since they
 history). If you supply the desired tag names, SinCity will apply these tag names to all the builds in the given build
 configuration.
 
-![Tagging](/images/tagging.PNG)
-
 If you leave the tagging text fields empty, no tagging is done.
 
 The culprit-finding builds triggered automatically are put to the queue as soon as the failing build completes. Given that
