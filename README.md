@@ -8,7 +8,8 @@ Which of the 6 commits is to blame?
 ![From green to red](/images/from-green-to-red.PNG)
 
 You can manually trigger the same build for the 5 intermediate commits, but this can be a tedious process. SinCity lets you
-achieve this with a few clicks, and can even trigger the intermediate builds automatically if you choose to do so.
+achieve this with a few clicks, and can even trigger the intermediate builds [automatically](#automatic-culprit-finding) if
+you choose to do so.
 
 ## Manually triggering the culprit finding
 
@@ -24,11 +25,9 @@ range of 6 commits between builds #5 and #6.
 
 When you select the two builds and click *Run*, SinCity will trigger builds for the 5 intermediate commits.
 
-You don't need to pick consecutive builds (like we did). If you choose non-consecutive builds, the intermediate builds will
-simply be *rerun* by SinCity.
-
-SinCity can also be configured (per build configuration) to trigger the culprit finding automatically whenever builds fail.
-Read more [below](#automatic-culprit-finding).
+You don't need to pick consecutive builds (like we did). For example, you could run the culprit finding between builds #3
+and #6. In that range there have been 5 + 4 + 6 = 15 changes, so the culprit finding would result in 14 builds. Two of these
+should be "identical" to builds #4 and #5 which have already run.
 
 ## What counts as build failure
 
