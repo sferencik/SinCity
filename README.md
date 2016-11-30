@@ -2,23 +2,32 @@
 
 SinCity is a TeamCity plugin that helps you find out who broke a build.
 
-Your build configuration has gone from green to red (or from red to redder), but the build that failed covered 7
-commits. Which of the 7 commits is responsible? You can manually trigger the same build for the 6 intermediate commits,
-but this can be a tedious process. SinCity lets you achieve this with a few clicks, and can even trigger the
-intermediate builds automatically if you choose to.
+Your build configuration has gone from green to red (or from red to redder), but the build that failed covered 6 commits.
+Which of the 6 commits is to blame?
 
-## The basics
+![From green to red](/images/from-green-to-red.PNG)
 
-The plugin is most useful if your builds are long and/or expensive. In that situation your builds typically cover more
-than one commit, which is perfectly fine and probably even desirable - until someone breaks the build. When that happens
-(which is hopefully rare), you typically *do* want to build each suspect commit individually.
+You can manually trigger the same build for the 5 intermediate commits, but this can be a tedious process. SinCity lets you
+achieve this with a few clicks, and can even trigger the intermediate builds automatically if you choose to do so.
+
+## Manually triggering the culprit finding
+
+The plugin is most useful if your builds are long and/or expensive. In that situation your builds typically cover more than
+one commit, which is perfectly fine and probably even desirable - until someone breaks the build. When that happens (which
+is hopefully rare), you typically *do* want to build each suspect commit individually.
 
 SinCity adds a new tab called *Trigger culprit finding* to every build configuration. In that tab, you pick two finished
-builds that will define your investigation range. SinCity then triggers builds for all the commits in that range. You
-can pick any two builds from the history; they need not have followed each other. (If you choose builds that did not
-immediately follow each other, the builds that have already ran between them will end up being _rerun_ by SinCity.)
+builds that will define your investigation range. For example, for the new test failure above, we want to investigate the
+range of 6 commits between builds #5 and #6.
 
-SinCity can also be configured (per build configuration) to trigger culprit finding automatically whenever builds fail.
+![Manual trigger](/images/manual-trigger-tab.PNG)
+
+When you select the two builds and click *Run*, SinCity will trigger builds for the 5 intermediate commits.
+
+You don't need to pick consecutive builds (like we did). If you choose non-consecutive builds, the intermediate builds will
+simply be *rerun* by SinCity.
+
+SinCity can also be configured (per build configuration) to trigger the culprit finding automatically whenever builds fail.
 Read more [below](#automatic-culprit-finding).
 
 ## What counts as build failure
@@ -29,7 +38,7 @@ Same as TeamCity itself, SinCity recognises two types of build issues:
    out", "Some tests have failed")
 2. individual test failures (e.g. "*MySuite: my.test.package.MyClass.myTest* failed")
 
-For either of these issues, you can specify whether SinCity should trigger culprit-finding when they occur. You can
+For either of these two issue types, you can specify whether SinCity should trigger culprit finding when they occur. You can
 choose from three options:
 * No (i.e. ignore this kind of issues)
 * New (i.e. only trigger culprit finding if this is a new error)
@@ -38,6 +47,21 @@ choose from three options:
 ![What counts as build failure](/images/two-types-of-issues.PNG)
 
 The default behaviour is as shown above, i.e. investigate only if there are new build problems or new test failures.
+
+## Example
+
+Let's find which of the 6 commits shown above broke the test. We hit *Run* and SinCity queues 5 builds. After they've
+completed, the situation looks as follows:
+
+![overview-with-cf-builds](/images/overview-with-cf-builds.PNG)
+
+TeamCity is showing the builds ordered by start time. Let's consult the *Change Log* view to see their logical ordering (by
+commit):
+
+![change-log-with-cf-builds](/images/change-log-with-cf-builds.PNG)
+
+Notice how the builds #5 and #6 delimit the range which was originally opaque to us. SinCity has helped us identify that the
+test was broken by build #9, i.e. most likely by the change marked as "01:24:39".
 
 ## Configuration parameters of the triggered builds
 
