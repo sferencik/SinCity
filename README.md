@@ -21,10 +21,7 @@ SinCity adds a new tab called *Trigger culprit finding* to every build configura
 builds that will define your investigation range. For example, for the new test failure above, we want to investigate the
 range of 6 commits between builds #5 and #6.
 
-<<<<<<< HEAD
 <a name="manual-trigger"></a>
-=======
->>>>>>> c1178f5e0e3ace7ad12f9ed550dfa18aaaff64a5
 ![Manual trigger](/images/manual-trigger-tab.PNG)
 
 When you select the two builds and click *Run*, SinCity will trigger builds for the 5 intermediate commits.
@@ -51,7 +48,6 @@ choose from three options:
 
 The default behaviour is as shown above, i.e. investigate only if there are *new* build problems or new test failures.
 
-<<<<<<< HEAD
 ### Example
 
 Let's find which of the 6 commits shown above broke the test. We hit *Run* at the bottom of the *Trigger culprit finding*
@@ -64,22 +60,10 @@ After they've completed, the situation looks as follows:
 As a reminder, the first failure was in build #6. Builds #7 .. #11 were triggered by SinCity. TeamCity is showing all the
 builds ordered by start time. In our case it's more useful to order them logically, i.e. by commit time. To do that,
 let's switch to the *Change Log* view:
-=======
-## Example
-
-Let's find which of the 6 commits shown above broke the test. We hit *Run* at the bottom of the *Trigger culprit finding*
-tab and SinCity queues 5 builds. After they've completed, the situation looks as follows:
-
-![overview-with-cf-builds](/images/overview-with-cf-builds.PNG)
-
-TeamCity is showing the builds ordered by start time. Let's consult the *Change Log* view to see their logical ordering (by
-commit):
->>>>>>> c1178f5e0e3ace7ad12f9ed550dfa18aaaff64a5
 
 ![change-log-with-cf-builds](/images/change-log-with-cf-builds.PNG)
 
 Notice how the builds #5 and #6 delimit the range which was originally opaque to us. SinCity has helped us identify that the
-<<<<<<< HEAD
 test got broken in build #9, i.e. most likely by the change marked as "01:24:39".
 
 ## The *Failure Culprit Overview* tab
@@ -161,9 +145,6 @@ The culprit-finding builds triggered automatically are put to the queue as soon 
 they logically belong to the just-finished build, they are put to the *top* of the queue so they can run ASAP. The same is
 not true for manually triggered builds, since they are "merely" someone's personal initiative, just like when someone
 triggers a build manually.
-=======
-test was broken by build #9, i.e. most likely by the change marked as "01:24:39".
->>>>>>> c1178f5e0e3ace7ad12f9ed550dfa18aaaff64a5
 
 ## Configuration parameters of the triggered builds
 
@@ -201,31 +182,6 @@ TeamCity from thinking that all the builds are equivalent and removing some of t
 queue optimisation). Read more about the build queue optimisation
 [here](https://confluence.jetbrains.com/display/TCD9/Build+Queue#BuildQueue-BuildQueueOptimizationbyTeamCity).
 
-<<<<<<< HEAD
-=======
-## Automatic culprit finding
-
-You can set your build configuration to trigger the culprit finding automatically every time there are build failures
-and the failing build covered more than one commit. To do so, enable the "SinCity" build feature for your build
-configuration.
-
-![build-feature](/images/build-feature.PNG)
-
-
-![build-feature-details](/images/build-feature-details.PNG)
-
-The bottom part of this screen should already look familiar. The settings in the top part (*Tagging*) are useful if you want
-to distinguish the builds triggered by SinCity from the other builds (since they all intermingle in the build configuration
-history). If you supply the desired tag names, SinCity will apply these tag names to all the builds in the given build
-configuration.
-
-If you leave the tagging text fields empty, no tagging is done.
-
-The culprit-finding builds triggered automatically are put to the queue as soon as the failing build completes. Given that
-they logically belong to the just-finished build, they are put to the *top* of the queue so they can run ASAP. The same is
-not true for manually triggered builds, since they are "merely" someone's personal initiative, just like when someone
-triggers a build manually.
->>>>>>> c1178f5e0e3ace7ad12f9ed550dfa18aaaff64a5
 
 ## Triggered-by message
 
