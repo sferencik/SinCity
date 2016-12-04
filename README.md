@@ -21,6 +21,7 @@ SinCity adds a new tab called *Trigger culprit finding* to every build configura
 builds that will define your investigation range. For example, for the new test failure above, we want to investigate the
 range of 6 commits between builds #5 and #6.
 
+<a name="manual-trigger"></a>
 ![Manual trigger](/images/manual-trigger-tab.PNG)
 
 When you select the two builds and click *Run*, SinCity will trigger builds for the 5 intermediate commits.
@@ -29,7 +30,7 @@ You don't need to pick consecutive builds (like we did). For example, you could 
 and #6. In that range there have been 5 + 4 + 6 = 15 changes (see the screenshot at the top) so the culprit finding would
 result in 14 builds. 2 of these 14 should be effectively "reruns" of #4 and #5.
 
-## What counts as build failure
+### What counts as a build failure
 
 Same as TeamCity itself, SinCity recognises two types of build issues:
 
@@ -40,27 +41,110 @@ Same as TeamCity itself, SinCity recognises two types of build issues:
 For either of these two issue types, you can specify whether SinCity should trigger culprit finding when they occur. You can
 choose from three options:
 * No (i.e. ignore this kind of issues)
-* New (i.e. only trigger culprit finding if this is a new error)
-* All (i.e. trigger culprit finding even if this error already occurred in the previous build)
+* New (i.e. only trigger culprit finding if there are new errors of this kind)
+* All (i.e. trigger culprit finding even if all the error of this kind already occurred in the previous build)
 
 ![What counts as build failure](/images/two-types-of-issues.PNG)
 
 The default behaviour is as shown above, i.e. investigate only if there are *new* build problems or new test failures.
 
-## Example
+### Example
 
 Let's find which of the 6 commits shown above broke the test. We hit *Run* at the bottom of the *Trigger culprit finding*
-tab and SinCity queues 5 builds. After they've completed, the situation looks as follows:
+tab (see screenshot [above](#manual-trigger)) and SinCity queues 5 builds.
+
+After they've completed, the situation looks as follows:
 
 ![overview-with-cf-builds](/images/overview-with-cf-builds.PNG)
 
-TeamCity is showing the builds ordered by start time. Let's consult the *Change Log* view to see their logical ordering (by
-commit):
+As a reminder, the first failure was in build #6. Builds #7 .. #11 were triggered by SinCity. TeamCity is showing all the
+builds ordered by start time. In our case it's more useful to order them logically, i.e. by commit time. To do that,
+let's switch to the *Change Log* view:
 
 ![change-log-with-cf-builds](/images/change-log-with-cf-builds.PNG)
 
 Notice how the builds #5 and #6 delimit the range which was originally opaque to us. SinCity has helped us identify that the
-test was broken by build #9, i.e. most likely by the change marked as "01:24:39".
+test got broken in build #9, i.e. most likely by the change marked as "01:24:39".
+
+## The *Failure Culprit Overview* tab
+
+SinCity gives you another way to look at the test failures and identify the suspects. Each build configuration has a new
+tab called *Failure Culprit Overview*. This is a table showing, for each test failure, which range of commits is on the
+suspect list. (Ideally, we want to narrow down the list of suspects to one.)
+
+Consider the following example: in the last three builds, a build configuration has gone from green (zero failures) to
+one failure (in build #24) and to two failures (in build #25):
+
+![zero-one-two-failures](/images/zero-one-two-failures.PNG)
+
+On closer inspection, we see that the first test failure was caused by one of four commits, and the second test failure
+also has four suspects:
+
+![four-and-four-suspects](/images/four-and-four-suspects.PNG)
+
+The new *Failure Culprit Overview* tab gives you a more visual representation of the situation:
+
+![failure-culprit-overview](/images/failure-culprit-overview.PNG)
+
+It tells you that:
+
+* test `MySuite: baz` first failed in build #24, which covered four commits; it lists these commits
+* test `MySuite: bar` first failed in build #25, which also covered four commits
+
+It clearly highlights that the commits that broke `bar` are innocent when it comes to `baz`, and vice versa.
+
+This is very useful in more complex situations, as it lets you quickly identify which failures may be related, whom to
+address, and it also shows you which test failures don't have a clear culprit (i.e. multiple commits are still suspect).
+
+OK, so let's drill down by running the culprit finding. Switch to the *Trigger culprit finding* tab. We need to find
+culprit over two ranges, four commits each, i.e. we need to run 3 + 3 builds. If we don't mind running one extra build,
+we can trigger it as follows:
+
+![manual-trigger-tab-in-fco-story](/images/manual-trigger-tab-in-fco-story.PNG)
+
+This queues 7 builds. After they are complete, we can use the *Change Log* tab as previously:
+
+![change-log-in-fco-story](/images/change-log-in-fco-story.PNG)
+
+Note the following:
+
+* the original builds are #23 (zero failures), #24 (one failure), #25 (two failures)
+* by triggering culprit finding for this range, we ran 7 new builds; #29 was extra and was equivalent to #24
+* TeamCity now clearly shows that the first test failure came in build #27, i.e. after commit `d152c3d4e4ec`; similarly,
+the second build failure appeared in #30, i.e. after commit `164404abc16c`.
+
+This analysis, however, strains the eye. Look at how the same data is presented in the *Failure culprit overview* tab:
+
+![failure-culprit-overview-in-fco-story](/images/failure-culprit-overview-in-fco-story.PNG)
+
+This shows the exact same results as we just laboriously extracted from the *Change Log* above, in a much clearer
+fashion. Notice that the *Failure culprit overview* tab doesn't show *all* the changes. It only shows those which are
+relevant for identifying the culprit. Thus, for two test failures (two rows) it only shows two columns now. This is the
+ideal state: you can assign investigations and drive the build configuration to green again.
+
+## Automatic culprit finding
+
+You can set your build configuration to trigger the culprit finding automatically every time there are build failures
+and the failing build covered more than one commit. To do so, enable the "SinCity" build feature for your build
+configuration.
+
+![build-feature](/images/build-feature.PNG)
+
+
+![build-feature-details](/images/build-feature-details.PNG)
+
+The bottom part of this screen should already look familiar. The settings in the top part (*Tagging*) are useful if you want
+to distinguish the builds triggered via SinCity from the other builds (since they all intermingle in the build configuration
+history). If you supply tag names here, SinCity will apply them to all the builds in the given build configuration. For
+the setting above, all SinCity-triggered builds would get the *`culprit-finding`* tag, while all the other builds would
+get the *`regular`* tag.
+
+If you leave the tagging text fields empty, no tagging is done.
+
+The culprit-finding builds triggered automatically are put to the queue as soon as the failing build completes. Given that
+they logically belong to the just-finished build, they are put to the *top* of the queue so they can run ASAP. The same is
+not true for manually triggered builds, since they are "merely" someone's personal initiative, just like when someone
+triggers a build manually.
 
 ## Configuration parameters of the triggered builds
 
@@ -98,28 +182,6 @@ TeamCity from thinking that all the builds are equivalent and removing some of t
 queue optimisation). Read more about the build queue optimisation
 [here](https://confluence.jetbrains.com/display/TCD9/Build+Queue#BuildQueue-BuildQueueOptimizationbyTeamCity).
 
-## Automatic culprit finding
-
-You can set your build configuration to trigger the culprit finding automatically every time there are build failures
-and the failing build covered more than one commit. To do so, enable the "SinCity" build feature for your build
-configuration.
-
-![build-feature](/images/build-feature.PNG)
-
-
-![build-feature-details](/images/build-feature-details.PNG)
-
-The bottom part of this screen should already look familiar. The settings in the top part (*Tagging*) are useful if you want
-to distinguish the builds triggered by SinCity from the other builds (since they all intermingle in the build configuration
-history). If you supply the desired tag names, SinCity will apply these tag names to all the builds in the given build
-configuration.
-
-If you leave the tagging text fields empty, no tagging is done.
-
-The culprit-finding builds triggered automatically are put to the queue as soon as the failing build completes. Given that
-they logically belong to the just-finished build, they are put to the *top* of the queue so they can run ASAP. The same is
-not true for manually triggered builds, since they are "merely" someone's personal initiative, just like when someone
-triggers a build manually.
 
 ## Triggered-by message
 
