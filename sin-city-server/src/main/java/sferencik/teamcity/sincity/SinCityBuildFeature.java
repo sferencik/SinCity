@@ -48,18 +48,6 @@ public class SinCityBuildFeature extends BuildFeature {
 
     @Nullable
     @Override
-    public PropertiesProcessor getParametersProcessor() {
-        return new PropertiesProcessor() {
-            @NotNull
-            public Collection<InvalidProperty> process(@Nullable final Map<String, String> propertiesMap) {
-                // anything goes
-                return new ArrayList<InvalidProperty>();
-            }
-        };
-    }
-
-    @Nullable
-    @Override
     public Map<String, String> getDefaultParameters() {
         HashMap<String, String> defaultParameters = new HashMap<String, String>();
         defaultParameters.put(new SettingNames().getRbTriggerOnBuildProblem(), "New");
