@@ -11,6 +11,7 @@ import sferencik.teamcity.sincity.SinCityUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class BuildStatusListener
 {
@@ -61,6 +62,11 @@ public class BuildStatusListener
                 SBuildFeatureDescriptor sinCityFeature = SinCityBuildFeature.getSinCityFeature(buildType);
                 if (sinCityFeature == null)
                     return;
+
+                if (build.isOutdated()) {
+                    Loggers.SERVER.info("[SinCity] the build is historical; will not trigger culprit finding");
+                    return;
+                }
 
                 Map<String, String> parameters = sinCityFeature.getParameters();
                 SettingNames settingNames = new SettingNames();
