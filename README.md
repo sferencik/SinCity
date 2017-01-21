@@ -1,4 +1,4 @@
-# SinCity: hunting down the gangstas
+# SinCity: hunting down the gangstas [![Build Status](https://travis-ci.org/sferencik/SinCity.svg?branch=master)](https://travis-ci.org/sferencik/SinCity)
 
 SinCity is a TeamCity plugin that helps you find out who broke a build.
 
