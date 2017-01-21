@@ -138,7 +138,7 @@ The intermediate builds triggered automatically have a "Triggered by" set to "Si
 ## Development notes
 To build, test, and package the plugin, run `mvn package` from the root directory.
 
-To deploy the plugin, copy `target/sin-city.zip` into the TeamCity plugin directory and restart the server.
+To deploy the plugin, copy `sin-city.zip` into the TeamCity plugin directory and restart the server. If you've built locally, get the zip file from `target/sin-city.zip`; otherwise grab the [latest released version](https://github.com/sferencik/SinCity/releases).
 
 ## Ideas for improvement
 
